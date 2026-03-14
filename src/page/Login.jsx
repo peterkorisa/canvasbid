@@ -1,10 +1,10 @@
 import React from "react";
 import Navbar from "../component/Navbar";
 
-const LoginForm = () => {
+const LoginForm = ({ toggleTheme, theme }) => {
   return (
     <>
-      <Navbar />
+      <Navbar toggleTheme={toggleTheme} theme={theme} />
 
       <section className="bg-gray-50 dark:bg-gray-900 py-20 w-full">
         <div className="w-full grid lg:grid-cols-2 gap-16 items-center">
@@ -60,7 +60,7 @@ const LoginForm = () => {
                 {/* Submit */}
                 <button
                   type="submit"
-                  className="w-full py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold transition transform hover:scale-[1.02]"
+                  className="w-full py-3 rounded-lg !bg-[#FF9E0C] hover:bg-blue-700 text-white font-semibold transition transform hover:scale-[1.02]"
                 >
                   Login
                 </button>
