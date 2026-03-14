@@ -24,7 +24,7 @@ const features = [
 
 const FeaturedSection = () => {
   return (
-    <div className="bg-base-100 py-16 px-6 lg:px-20">
+    <div className=" py-16 px-6 lg:px-20">
       <h2 className="text-4xl font-bold text-center mb-12">Why Choose CanvasBid?</h2>
       <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 text-center">
         {features.map((feature) => (

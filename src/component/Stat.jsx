@@ -3,7 +3,7 @@ import { FaGavel, FaUsers, FaPalette } from "react-icons/fa";
 
 const StatsSection = () => {
   return (
-    <div className="w-full bg-white shadow-lg py-10">
+    <div className="w-full  py-10">
       <div className="stats w-full max-w-full flex justify-around flex-col sm:flex-row px-4 sm:px-0">
         {/* Live Auctions */}
         <div className="stat place-items-center flex-1 px-4 py-6">
