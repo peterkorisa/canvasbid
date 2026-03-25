@@ -19,7 +19,7 @@ import art3 from "./assets/art3.jpg";
 import art4 from "./assets/art4.jpg";
 import CreateArtwork from "./artists/createArtwork/CreateArtwork";
 import UpdateArtwork from "./artists/updateArtwork/UpdateArtwork";
-import DeleteArtwork from './artists/deleteArtwork/DeleteArtwork';
+import DeleteArtwork from "./artists/deleteArtwork/DeleteArtwork";
 
 function App() {
   const [artworks, setArtworks] = useState([
@@ -101,9 +101,6 @@ function App() {
           </Route>
           <Route path="/artworks" element={<Artworks />} />
           <Route path="/product/:id" element={<Productpage />} />
-          
-    
-         
         </Routes>
       </div>
     </>
