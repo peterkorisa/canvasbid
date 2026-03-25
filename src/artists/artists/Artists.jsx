@@ -3,10 +3,13 @@ import { FaHome } from "react-icons/fa";
 import { RiAuctionFill } from "react-icons/ri";
 import { FaRegImages } from "react-icons/fa6";
 import { FaUsersGear } from "react-icons/fa6";
+import { IoIosCreate } from "react-icons/io";
+import { FaPlusSquare } from "react-icons/fa";
+import { MdDeleteSweep } from "react-icons/md";
 
 import { Link, Outlet, useNavigate } from "react-router-dom";
 
-const Dashboard = () => {
+const Artists = () => {
   const navigate = useNavigate();
   return (
     <div className="drawer lg:drawer-open">
@@ -54,63 +57,62 @@ const Dashboard = () => {
         <div className="flex min-h-full flex-col items-start bg-base-200 is-drawer-close:w-16 is-drawer-open:w-64">
           {/* Sidebar content here */}
           <ul className="menu w-full grow">
-            {/*Home admin*/}
             <li>
               <button
                 onClick={() => {
-                  navigate("/admin/");
+                  navigate("/artist/");
                 }}
                 className="is-drawer-close:tooltip is-drawer-close:tooltip-right"
-                data-tip="Home dashboard"
-              >
-                <FaHome className="text-xl" />
-
-                <span className="is-drawer-close:hidden ">Home dashboard</span>
-              </button>
-            </li>
-
-            {/*artwork*/}
-            <li>
-              <button
-                onClick={() => {
-                  navigate("/admin/artworks");
-                }}
-                className="is-drawer-close:tooltip is-drawer-close:tooltip-right"
-                data-tip="Art works"
-              >
-                <FaRegImages className="text-xl" />
-
-                <span className="is-drawer-close:hidden ">Art works</span>
-              </button>
-            </li>
-            {/*Auctions*/}
-            <li>
-              <button
-                onClick={() => {
-                  navigate("/admin/auctions");
-                }}
-                className="is-drawer-close:tooltip is-drawer-close:tooltip-right"
-                data-tip="Auctions"
+                data-tip="Artworks"
               >
                 <RiAuctionFill className="text-xl" />
 
-                <span className="is-drawer-close:hidden ">Auctions</span>
+                <span className="is-drawer-close:hidden ">Artworks</span>
               </button>
             </li>
-
+            {/*create artwork*/}
             <li>
               <button
                 onClick={() => {
-                  navigate("/admin/users");
+                  navigate("/artist/create_artwork");
                 }}
                 className="is-drawer-close:tooltip is-drawer-close:tooltip-right"
-                data-tip="Users"
+                data-tip="Create artwork"
               >
-                <FaUsersGear className="text-xl" />
+                <FaPlusSquare className="text-xl" />
 
-                <span className="is-drawer-close:hidden ">Users</span>
+                <span className="is-drawer-close:hidden ">Create artwork</span>
               </button>
             </li>
+            {/*Update artwork*/}
+            <li>
+              <button
+                onClick={() => {
+                  navigate("/artist/update_artwork");
+                }}
+                className="is-drawer-close:tooltip is-drawer-close:tooltip-right"
+                data-tip="Update artwork"
+              >
+                <IoIosCreate className="text-xl" />
+
+                <span className="is-drawer-close:hidden ">Update artwork</span>
+              </button>
+            </li>
+            {/*Delete artwork*/}
+            <li>
+              <button
+                onClick={() => {
+                  navigate("/artist/delete_artwork");
+                }}
+                className="is-drawer-close:tooltip is-drawer-close:tooltip-right"
+                data-tip="Delete artwork"
+              >
+                <MdDeleteSweep className="text-xl" />
+
+                <span className="is-drawer-close:hidden ">Delete artwork</span>
+              </button>
+            </li>
+            {/*Auctions*/}
           </ul>
         </div>
       </div>
@@ -118,4 +120,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default Artists;
