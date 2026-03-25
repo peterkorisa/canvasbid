@@ -83,27 +83,30 @@ const SearchBar = () => {
       </div>
 
       {/* Tag filter form */}
-      <form className="flex flex-wrap gap-2 justify-center">
-        {tags.map((tag) => (
-          <input
-            key={tag}
-            type="checkbox"
-            name="tags"
-            aria-label={tag}
-            className={`btn btn-sm ${
-              selectedTags.includes(tag) ? "btn-accent" : "btn-outline"
-            }`}
-            checked={selectedTags.includes(tag)}
-            onChange={() => toggleTag(tag)}
-          />
-        ))}
-        <input
-          type="reset"
-          value="×"
-          onClick={resetTags}
-          className="btn btn-square"
-        />
-      </form>
+<form className="flex flex-wrap gap-2 justify-center ">
+  {tags.map((tag) => (
+    <input
+      key={tag}
+      type="checkbox"
+      name="tags"
+      aria-label={tag}
+      className={`btn btn-sm transition ${
+        selectedTags.includes(tag)
+          ? "!text-[#FF9E0C] border-[#FF9E0C] bg-transparent"
+          : "btn-outline hover:!text-[#FF9E0C] hover:border-[#FF9E0C]"
+      }`}
+      checked={selectedTags.includes(tag)}
+      onChange={() => toggleTag(tag)}
+    />
+  ))}
+
+  <input
+    type="reset"
+    value="×"
+    onClick={resetTags}
+    className="btn btn-square"
+  />
+</form>
     </div>
   );
 };
