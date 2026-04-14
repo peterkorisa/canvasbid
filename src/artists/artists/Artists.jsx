@@ -84,35 +84,10 @@ const Artists = () => {
                 <span className="is-drawer-close:hidden ">Create artwork</span>
               </button>
             </li>
-            {/*Update artwork*/}
-            <li>
-              <button
-                onClick={() => {
-                  navigate("/artist/update_artwork");
-                }}
-                className="is-drawer-close:tooltip is-drawer-close:tooltip-right"
-                data-tip="Update artwork"
-              >
-                <IoIosCreate className="text-xl" />
-
-                <span className="is-drawer-close:hidden ">Update artwork</span>
-              </button>
-            </li>
+            
             {/*Delete artwork*/}
-            <li>
-              <button
-                onClick={() => {
-                  navigate("/artist/delete_artwork");
-                }}
-                className="is-drawer-close:tooltip is-drawer-close:tooltip-right"
-                data-tip="Delete artwork"
-              >
-                <MdDeleteSweep className="text-xl" />
 
-                <span className="is-drawer-close:hidden ">Delete artwork</span>
-              </button>
-            </li>
-            {/*Auctions*/}
+            
           </ul>
         </div>
       </div>

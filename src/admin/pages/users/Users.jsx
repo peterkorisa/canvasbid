@@ -92,7 +92,7 @@ const Users = () => {
   return (
     <div>
       <div className="overflow-x-auto ps-8">
-        <table className="table ">
+        <table className="table">
           {/* head */}
           <thead className="text-[#FF9E0C]">
             <tr>
