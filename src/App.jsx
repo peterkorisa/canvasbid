@@ -18,8 +18,7 @@ import art2 from "./assets/art2.jpg";
 import art3 from "./assets/art3.jpg";
 import art4 from "./assets/art4.jpg";
 import CreateArtwork from "./artists/createArtwork/CreateArtwork";
-import UpdateArtwork from "./artists/updateArtwork/UpdateArtwork";
-import DeleteArtwork from "./artists/deleteArtwork/DeleteArtwork";
+import ArtworksHome from "./page/ArtworksHome";
 
 function App() {
   const [artworks, setArtworks] = useState([
@@ -33,7 +32,7 @@ function App() {
       auctionEndTime: "2026-03-30 18:00:00",
       category: "Abstract",
       tags: ["sunset", "abstract"],
-      image: art1,
+      images: [art1],
       status: "pending",
     },
     {
@@ -46,7 +45,7 @@ function App() {
       auctionEndTime: "2026-03-31 12:00:00",
       category: "Nature",
       tags: ["ocean", "water", "calm"],
-      image: art2,
+      images: [art2],
       status: "accepted",
     },
     {
@@ -59,7 +58,7 @@ function App() {
       auctionEndTime: "2026-04-01 15:00:00",
       category: "Urban",
       tags: ["city", "night", "lights"],
-      image: art3,
+      images: [art3],
       status: "pending",
     },
     {
@@ -68,14 +67,80 @@ function App() {
       title: "Golden Desert",
       description: "Desert landscape with golden sand dunes.",
       initialPrice: 600,
-      auctionStartTime: "2026-03-28 T10:00:00",
-      auctionEndTime: "2026-04-02 T10:00:00",
+      auctionStartTime: "2026-04-01 15:00:00",
+      auctionEndTime: "2026-04-01 15:00:00",
       category: "Landscape",
       tags: ["desert", "sand", "nature"],
-      image: art4,
+      images: [art4],
       status: "accepted",
     },
   ]);
+   const [pendingArtworks, setPendingArtworks] = useState([
+    {
+      id: 1,
+      artistName: "Laila Mostafa",
+      title: "Sunset Dreams",
+      description: "Abstract painting inspired by sunset colors.",
+      initialPrice: 500,
+      auctionStartTime: "2026-03-25 18:00:00",
+      auctionEndTime: "2026-03-30 18:00:00",
+      category: "Abstract",
+      tags: ["sunset", "abstract"],
+      images: [art1],
+      status: "pending",
+    },
+    {
+      id: 2,
+      artistName: "Youssef Samy",
+      title: "Ocean Whisper",
+      description: "A calm view of the ocean with soft tones.",
+      initialPrice: 700,
+      auctionStartTime: "2026-03-26 12:00:00",
+      auctionEndTime: "2026-03-31 12:00:00",
+      category: "Nature",
+      tags: ["ocean", "water", "calm"],
+      images: [art2],
+      status: "pending",
+    },
+    {
+      id: 3,
+      artistName: "Nour Khaled",
+      title: "City Lights",
+      description: "Modern city at night with vibrant lights.",
+      initialPrice: 900,
+      auctionStartTime: "2026-03-27 15:00:00",
+      auctionEndTime: "2026-04-01 15:00:00",
+      category: "Urban",
+      tags: ["city", "night", "lights"],
+      images: [art3],
+      status: "pending",
+    },
+    {
+      id: 4,
+      artistName: "Omar Adel",
+      title: "Golden Desert",
+      description: "Desert landscape with golden sand dunes.",
+      initialPrice: 600,
+      auctionStartTime: "2026-04-01 15:00:00",
+      auctionEndTime: "2026-04-01 15:00:00",
+      category: "Landscape",
+      tags: ["desert", "sand", "nature"],
+      images: [art4],
+      status: "pending",
+    },
+  ]);
+  const tags = [
+    "Abstract",
+    "Realism",
+    "Nature",
+    "Portrait",
+    "Digital",
+    "Oil",
+    "Watercolor",
+    "Limited Edition",
+    "Signed",
+    "Modern",
+  ];
   return (
     <>
       <div className="">
@@ -88,18 +153,28 @@ function App() {
           {/* Admin Routes */}
           <Route path="/admin/" element={<Dashboard />}>
             <Route index element={<AdminMain />} />
-            <Route path="artworks" element={<Artworks />} />
+            <Route path="artworks" element={<Artworks pendingArtworks={pendingArtworks}  setPendingArtworks={setPendingArtworks}/>} />
             <Route path="users" element={<Users />} />
             <Route path="auctions" element={<Auctions />} />
           </Route>
           {/* Artist Routes */}
           <Route path="/artist/" element={<Artists />}>
-            <Route index element={<ListArtwork artworks={artworks} />} />
-            <Route path="create_artwork" element={<CreateArtwork />} />
-            <Route path="update_artwork" element={<UpdateArtwork />} />
-            <Route path="delete_artwork" element={<DeleteArtwork />} />
+            <Route
+              index
+              element={
+                <ListArtwork
+                  artworks={artworks}
+                  setArtworks={setArtworks}
+                  tags={tags}
+                />
+              }
+            />
+            <Route
+              path="create_artwork"
+              element={<CreateArtwork tags={tags} setArtworks={setArtworks} />}
+            />
           </Route>
-          <Route path="/artworks" element={<Artworks />} />
+          <Route path="/artworks" element={<ArtworksHome />} />
           <Route path="/product/:id" element={<Productpage />} />
         </Routes>
       </div>

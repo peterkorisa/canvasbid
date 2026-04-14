@@ -1,63 +1,13 @@
-const CreateArtwork = () => {
+import CreateArtworksForm from "../components/createArtworksForm/CreateArtworksForm";
+
+const CreateArtwork = ({setArtworks,tags}) => {
+
   return (
-    <div className="flex flex-col">
-      <div className="">
-        <h1 className="">Add your latest artwork</h1>
+    <div className="flex flex-col items-center w-full gap-3">
+      <div className=" self-center">
+        <h2 className="text-3xl font-serif">Add your latest artwork</h2>
       </div>
-      <form action="" className="flex flex-col">
-        <div>
-          <fieldset className="fieldset">
-            <legend className="fieldset-legend text-white">
-              Enter artwork's title
-            </legend>
-            <input
-              type="text"
-              className="input text-black"
-              placeholder="Type here"
-            />
-          </fieldset>
-        </div>
-        <div>
-          <fieldset className="fieldset">
-            <legend className="fieldset-legend text-white">
-              Enter artwork's description
-            </legend>
-            <input
-              type="text"
-              className="input text-black"
-              placeholder="Type here"
-            />
-          </fieldset>
-        </div>
-        <div>
-          <fieldset className="fieldset">
-            <legend className="fieldset-legend text-white">
-              Enter artwork's initial price
-            </legend>
-            <input
-              type="number"
-              className="input text-black"
-              placeholder="Type here"
-            />
-          </fieldset>
-        </div>
-        <div>
-          <fieldset className="fieldset">
-            <legend className="fieldset-legend text-white">
-              Enter artwork's start time
-            </legend>
-            <input type="datetime-local" className="input text-black" />
-          </fieldset>
-        </div>
-        <div>
-          <fieldset className="fieldset">
-            <legend className="fieldset-legend text-white">
-              Enter artwork's end time
-            </legend>
-            <input type="datetime-local" className="input text-black" />
-          </fieldset>
-        </div>
-      </form>
+      <CreateArtworksForm  tags={tags}  setArtworks={setArtworks} />
     </div>
   );
 };

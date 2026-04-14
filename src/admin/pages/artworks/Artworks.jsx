@@ -1,10 +1,14 @@
 //pending artwork
 
-const Artworks = () => {
+import PendingArtworksTable from "../../components/pendingArtworksTable/PendingArtworksTable";
+
+const Artworks = ({ pendingArtworks, setPendingArtworks }) => {
   return (
     <div>
-      <h1>Artworks</h1>
-      <p>Manage artworks here.</p>
+      <PendingArtworksTable
+        pendingArtworks={pendingArtworks}
+        setPendingArtworks={setPendingArtworks}
+      />
     </div>
   );
 };

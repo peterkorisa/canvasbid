@@ -3,7 +3,7 @@ import Navbar from "../component/Navbar";
 import SearchBar from "../component/search_bar/Search_bar";
 import ProductCard from "../component/prodect_card/Product_card";
 
-const Artworks = () => {
+const ArtworksHome = () => {
   const cards = [
     { id: "1", title: "Abstract Art", image: "https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp" },
     { id: "2", title: "Ocean Painting", image: "https://img.daisyui.com/images/stock/photo-1504215680853-026ed2a45def.webp" },
@@ -33,4 +33,4 @@ const Artworks = () => {
   );
 };
 
-export default Artworks;
+export default ArtworksHome;
