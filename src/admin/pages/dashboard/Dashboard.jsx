@@ -84,19 +84,6 @@ const Dashboard = () => {
               </button>
             </li>
             {/*Auctions*/}
-            <li>
-              <button
-                onClick={() => {
-                  navigate("/admin/auctions");
-                }}
-                className="is-drawer-close:tooltip is-drawer-close:tooltip-right"
-                data-tip="Auctions"
-              >
-                <RiAuctionFill className="text-xl" />
-
-                <span className="is-drawer-close:hidden ">Auctions</span>
-              </button>
-            </li>
 
             <li>
               <button

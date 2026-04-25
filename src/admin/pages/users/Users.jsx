@@ -108,15 +108,7 @@ const Users = () => {
               return (
                 <tr key={user.id}>
                   <td>
-                    <div className="flex items-center gap-3">
-                      <div className="avatar">
-                        <div className="mask mask-squircle h-12 w-12">
-                          <img
-                            src="https://img.daisyui.com/images/profile/demo/2@94.webp"
-                            alt="Avatar Tailwind CSS Component"
-                          />
-                        </div>
-                      </div>
+                    <div className="flex items-center">
                       <div>
                         <div className="font-bold">{user.name}</div>
                         {/* <div className="text-sm opacity-50">United States</div> */}
@@ -128,28 +120,24 @@ const Users = () => {
                   <td>{user.status}</td>
 
                   {user.status == "pending" && (
-                    <>
-                      <th className="!p-0 w-[10%]">
-                        <button
-                          onClick={() => {
-                            acceptArtists(user.id);
-                          }}
-                          className="btn !bg-[#00D390] btn-success btn-xs text-[#ffffff]"
-                        >
-                          Accept
-                        </button>
-                      </th>
-                      <th className="!p-0">
-                        <button
-                          onClick={() => {
-                            declineArtist(user.id);
-                          }}
-                          className="btn !bg-[#ff1313]  btn-ghost btn-xs text-[#ffffff]"
-                        >
-                          Decline
-                        </button>
-                      </th>
-                    </>
+                    <td className="flex flex-row gap-2">
+                      <button
+                        onClick={() => {
+                          acceptArtists(user.id);
+                        }}
+                        className="btn !bg-[#00D390] btn-success btn-xs text-[#ffffff]"
+                      >
+                        Accept
+                      </button>
+                      <button
+                        onClick={() => {
+                          declineArtist(user.id);
+                        }}
+                        className="btn !bg-[#ff1313]  btn-ghost btn-xs text-[#ffffff]"
+                      >
+                        Decline
+                      </button>
+                    </td>
                   )}
                 </tr>
               );
