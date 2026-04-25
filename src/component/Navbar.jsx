@@ -1,9 +1,44 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { getToken, removeToken, removeUser, getUserRole, getUser } from "../services/api";
+import { authService } from "../services/authService";
 
 const Navbar = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userRole, setUserRole] = useState(null);
+  const [userName, setUserName] = useState("");
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = getToken();
+    setIsLoggedIn(!!token);
+    if (token) {
+      const role = getUserRole();
+      setUserRole(role);
+      const user = getUser();
+      if (user && user.email) {
+        setUserName(user.email.split("@")[0]);
+      }
+    }
+  }, []);
+
+  const handleLogout = () => {
+    authService.logout();
+    setIsLoggedIn(false);
+    setUserRole(null);
+    setUserName("");
+    navigate("/");
+  };
+
+  const getDashboardLink = () => {
+    if (userRole === "Admin") return "/admin";
+    if (userRole === "Artist") return "/artists/artworks";
+    return "/artworks";
+  };
+
   return (
-    <div className=" ">
-      <div className="navbar  bg-transparent shadow-sm w-full fixed top-0 left-0 z-50 backdrop-blur-md">
+    <div className="">
+      <div className="navbar bg-transparent shadow-sm w-full fixed top-0 left-0 z-50 backdrop-blur-md">
         {/* Left Section */}
         <div className="navbar-start ">
           {/* Mobile Menu */}
@@ -103,12 +138,41 @@ const Navbar = () => {
 
         {/* Right Buttons */}
         <div className="navbar-end gap-2">
-          <Link to="/login" className="btn btn-outline">
-            Login
-          </Link>
-          <Link to="/register" className=" btn btn-primary !text-white">
-            Register
-          </Link>
+          {isLoggedIn ? (
+            <div className="dropdown dropdown-end">
+              <button tabIndex={0} className="btn btn-ghost">
+                <span className="text-sm">{userName}</span>
+              </button>
+              <ul
+                tabIndex={0}
+                className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52"
+              >
+                <li>
+                  <Link to={getDashboardLink()}>
+                    {userRole === "Admin" ? "Admin Dashboard" : userRole === "Artist" ? "My Artworks" : "Dashboard"}
+                  </Link>
+                </li>
+                {userRole === "Buyer" && (
+                  <li>
+                    <Link to="/watchlist">My Watchlist</Link>
+                  </li>
+                )}
+                <li>
+                  <a onClick={handleLogout}>Logout</a>
+                </li>
+              </ul>
+            </div>
+          ) : (
+            <>
+              <Link to="/login" className="btn btn-outline">
+                Login
+              </Link>
+              <Link to="/register" className=" btn btn-primary !text-white">
+                Register
+              </Link>
+            </>
+          )}
+
           <label className="swap swap-rotate">
             {/* this hidden checkbox controls the state */}
             <input

@@ -1,16 +1,40 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "../component/Navbar";
 import SearchBar from "../component/search_bar/Search_bar";
 import ProductCard from "../component/prodect_card/Product_card";
+import { LoadingSpinner } from "../component/LoadingSpinner";
+import { artworkService } from "../services/artworkService";
 
 const ArtworksHome = () => {
-  const cards = [
-    { id: "1", title: "Abstract Art", image: "https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp" },
-    { id: "2", title: "Ocean Painting", image: "https://img.daisyui.com/images/stock/photo-1504215680853-026ed2a45def.webp" },
-    { id: "3", title: "Mountains", image: "https://img.daisyui.com/images/stock/photo-1500530855697-b586d89ba3ee.webp" },
-    { id: "4", title: "City Lights", image: "https://img.daisyui.com/images/stock/photo-1492724441997-5dc865305da7.webp" },
-    { id: "5", title: "Forest", image: "https://img.daisyui.com/images/stock/photo-1501785888041-af3ef285b470.webp" },
-  ];
+  const [artworks, setArtworks] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchArtworks = async () => {
+      try {
+        setLoading(true);
+        const data = await artworkService.getAll();
+        setArtworks(Array.isArray(data) ? data : []);
+      } catch (err) {
+        setError(err.message || "Failed to load artworks");
+        setArtworks([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchArtworks();
+  }, []);
+
+  if (loading) {
+    return (
+      <>
+        <Navbar />
+        <LoadingSpinner text="Loading artworks..." />
+      </>
+    );
+  }
 
   return (
     <>
@@ -19,16 +43,30 @@ const ArtworksHome = () => {
         <SearchBar />
       </div>
 
-      <div className="flex flex-wrap justify-center gap-6 mt-10">
-        {cards.map((card) => (
-          <ProductCard
-            key={card.id}
-            id={card.id}
-            title={card.title}
-            image={card.image}
-          />
-        ))}
-      </div>
+      {error && (
+        <div className="mx-auto mt-10 max-w-4xl p-4 bg-red-100 dark:bg-red-900 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-200 rounded-lg">
+          Error: {error}
+        </div>
+      )}
+
+      {artworks.length === 0 ? (
+        <div className="flex justify-center items-center py-20">
+          <p className="text-gray-500 dark:text-gray-400 text-lg">
+            No artworks available yet.
+          </p>
+        </div>
+      ) : (
+        <div className="flex flex-wrap justify-center gap-6 mt-10 px-4 pb-10">
+          {artworks.map((artwork) => (
+            <ProductCard
+              key={artwork.artworkId}
+              id={artwork.artworkId}
+              title={artwork.title}
+              image={artwork.image || "https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"}
+            />
+          ))}
+        </div>
+      )}
     </>
   );
 };

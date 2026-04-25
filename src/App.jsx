@@ -19,6 +19,8 @@ import art3 from "./assets/art3.jpg";
 import art4 from "./assets/art4.jpg";
 import CreateArtwork from "./artists/createArtwork/CreateArtwork";
 import ArtworksHome from "./page/ArtworksHome";
+import Watchlist from "./page/Watchlist";
+import { ErrorProvider } from "./component/ErrorDialog";
 
 function App() {
   const [artworks, setArtworks] = useState([
@@ -142,7 +144,7 @@ function App() {
     "Modern",
   ];
   return (
-    <>
+    <ErrorProvider>
       <div className="">
         {" "}
         <Routes>
@@ -158,9 +160,9 @@ function App() {
             <Route path="auctions" element={<Auctions />} />
           </Route>
           {/* Artist Routes */}
-          <Route path="/artist/" element={<Artists />}>
+          <Route path="/artists/" element={<Artists />}>
             <Route
-              index
+              path="artworks"
               element={
                 <ListArtwork
                   artworks={artworks}
@@ -170,15 +172,16 @@ function App() {
               }
             />
             <Route
-              path="create_artwork"
+              path="create"
               element={<CreateArtwork tags={tags} setArtworks={setArtworks} />}
             />
           </Route>
           <Route path="/artworks" element={<ArtworksHome />} />
+          <Route path="/watchlist" element={<Watchlist />} />
           <Route path="/product/:id" element={<Productpage />} />
         </Routes>
       </div>
-    </>
+    </ErrorProvider>
   );
 }
 

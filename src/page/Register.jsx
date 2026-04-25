@@ -1,7 +1,62 @@
-import React from "react";
+import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import Navbar from "../component/Navbar";
+import { authService } from "../services/authService";
+import { LoadingSpinner } from "../component/LoadingSpinner";
 
 const RegisterForm = () => {
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [role, setRole] = useState("Buyer");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+    setLoading(true);
+
+    // Validation
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      setLoading(false);
+      return;
+    }
+
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const result = await authService.register(email, password, fullName, role);
+      setSuccess("Registration successful! Redirecting to login...");
+      
+      setTimeout(() => {
+        navigate("/login");
+      }, 2000);
+    } catch (err) {
+      setError(err.message || "Registration failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <>
+        <Navbar />
+        <LoadingSpinner text="Creating your account..." />
+      </>
+    );
+  }
+
   return (
     <>
       <Navbar />
@@ -29,7 +84,19 @@ const RegisterForm = () => {
           {/* Form Card */}
           <div className="px-6 lg:px-20">
             <div className="w-full bg-white dark:bg-gray-800 p-6 sm:p-10 rounded-2xl shadow-xl">
-              <form className="space-y-6">
+              {error && (
+                <div className="mb-4 p-4 bg-red-100 dark:bg-red-900 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-200 rounded-lg">
+                  {error}
+                </div>
+              )}
+
+              {success && (
+                <div className="mb-4 p-4 bg-green-100 dark:bg-green-900 border border-green-400 dark:border-green-700 text-green-700 dark:text-green-200 rounded-lg">
+                  {success}
+                </div>
+              )}
+
+              <form className="space-y-6" onSubmit={handleSubmit}>
 
                 {/* Full Name */}
                 <div>
@@ -40,6 +107,8 @@ const RegisterForm = () => {
                     type="text"
                     placeholder="John Doe"
                     required
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
                     className="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
                   />
                 </div>
@@ -53,8 +122,25 @@ const RegisterForm = () => {
                     type="email"
                     placeholder="you@example.com"
                     required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     className="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
                   />
+                </div>
+
+                {/* Role Selection */}
+                <div>
+                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                    Account Type
+                  </label>
+                  <select
+                    value={role}
+                    onChange={(e) => setRole(e.target.value)}
+                    className="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                  >
+                    <option value="Buyer">Buyer</option>
+                    <option value="Artist">Artist</option>
+                  </select>
                 </div>
 
                 {/* Password */}
@@ -66,6 +152,8 @@ const RegisterForm = () => {
                     type="password"
                     placeholder="********"
                     required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     className="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
                   />
                 </div>
@@ -79,6 +167,8 @@ const RegisterForm = () => {
                     type="password"
                     placeholder="********"
                     required
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
                     className="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
                   />
                 </div>
@@ -86,21 +176,22 @@ const RegisterForm = () => {
                 {/* Submit */}
                 <button
                   type="submit"
-                  className="w-full py-3 rounded-lg !bg-[#FF9E0C]  text-white font-semibold transition transform hover:scale-[1.02]"
+                  disabled={loading}
+                  className="w-full py-3 rounded-lg !bg-[#FF9E0C] hover:bg-orange-600 disabled:bg-gray-400 text-white font-semibold transition transform hover:scale-[1.02]"
                 >
-                  Register
+                  {loading ? "Creating Account..." : "Register"}
                 </button>
               </form>
 
               {/* Fixed Bottom Info */}
               <div className="mt-8 flex justify-center text-red-600 dark:text-red-400 text-sm">
                 <span>Already have an account?</span>
-                <a
-                  href="#"
+                <Link
+                  to="/login"
                   className="ml-1 text-red-600 dark:text-red-400 hover:underline"
                 >
                   Login here
-                </a>
+                </Link>
               </div>
             </div>
           </div>
