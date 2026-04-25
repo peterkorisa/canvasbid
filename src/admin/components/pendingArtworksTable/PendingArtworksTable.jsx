@@ -1,22 +1,21 @@
 import React from "react";
 
-const PendingArtworksTable = ({ pendingArtworks, setPendingArtworks }) => {
+const PendingArtworksTable = ({ pendingArtworks,handleAccept,handleDecline}) => {
   return (
     <div>
       <div className="overflow-x-auto">
         <table className="table">
-          {/* head */}
           <thead className="text-[#FF9E0C]">
             <tr>
-              <th>Name</th>
-              <th>Job</th>
-              <th>Favorite Color</th>
-              <th></th>
+              <th>Artwork</th>
+              <th>Artist</th>
+              <th>status</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
             {pendingArtworks.map((art) => (
-              <tr>
+              <tr key={art.id}>
                 <td>
                   <div className="flex items-center gap-3">
                     <div className="avatar">
@@ -28,21 +27,20 @@ const PendingArtworksTable = ({ pendingArtworks, setPendingArtworks }) => {
                       </div>
                     </div>
                     <div>
-                      <div className="font-bold">Hart Hagerty</div>
-                      <div className="text-sm opacity-50">United States</div>
+                      <div className="font-bold">{art.title}</div>
+                      
                     </div>
                   </div>
                 </td>
                 <td>
-                  Zemlak, Daniel and Leannon
-                  <br />
-                  <span className="badge badge-ghost badge-sm">
-                    Desktop Support Technician
-                  </span>
+                 {art.artistName}
+                  
+                  
                 </td>
-                <td>Purple</td>
-                <th>
-                  <button className="btn btn-ghost btn-xs">details</button>
+                <td>{art.status}</td>
+                <th className=" flex flex-row gap-4">
+                  <button onClick={()=>handleAccept(art.id)} className="btn !bg-success btn-success">Accept</button>
+                  <button onClick={()=>handleDecline(art.id)} className="btn !bg-error btn-error">decline</button>
                 </th>
               </tr>
             ))}
