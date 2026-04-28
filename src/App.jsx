@@ -108,7 +108,7 @@ function App() {
           {/* Artist Routes */}
           <Route path="/artists/" element={<Artists />}>
             <Route
-              path="artworks"
+              path=""
               element={
                 <ListArtwork
                   artworks={artworks}

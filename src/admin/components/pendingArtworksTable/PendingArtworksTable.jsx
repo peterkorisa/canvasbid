@@ -1,6 +1,10 @@
 import React from "react";
 
-const PendingArtworksTable = ({ pendingArtworks,handleAccept,handleDecline}) => {
+const PendingArtworksTable = ({
+  pendingArtworks,
+  handleAccept,
+  handleDecline,
+}) => {
   return (
     <div>
       <div className="overflow-x-auto">
@@ -20,31 +24,35 @@ const PendingArtworksTable = ({ pendingArtworks,handleAccept,handleDecline}) => 
                   <div className="flex items-center gap-3">
                     <div className="avatar">
                       <div className="mask mask-squircle h-12 w-12">
-                        <img
-                          src={art.images[0]}
-                          alt="Artwork's photo"
-                        />
+                        <img src={art.images[0]} alt="Artwork's photo" />
                       </div>
                     </div>
                     <div>
                       <div className="font-bold">{art.title}</div>
-                      
                     </div>
                   </div>
                 </td>
-                <td>
-                 {art.artistName}
-                  
-                  
-                </td>
+                <td>{art.artistName}</td>
                 <td>{art.status}</td>
-                <th className=" flex flex-row gap-4">
-                  <button onClick={()=>handleAccept(art.id)} className="btn !bg-success btn-success">Accept</button>
-                  <button onClick={()=>handleDecline(art.id)} className="btn !bg-error btn-error">decline</button>
-                </th>
+                {art.status === "pending" &&
+                  (art.status !== "accepted" || art.status !== "declined") && (
+                    <th className=" flex flex-row gap-4">
+                      <button
+                        onClick={() => handleAccept(art.id)}
+                        className="btn !bg-success btn-success"
+                      >
+                        Accept
+                      </button>
+                      <button
+                        onClick={() => handleDecline(art.id)}
+                        className="btn !bg-error btn-error"
+                      >
+                        decline
+                      </button>
+                    </th>
+                  )}
               </tr>
             ))}
-
           </tbody>
         </table>
       </div>
