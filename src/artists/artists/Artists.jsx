@@ -60,11 +60,7 @@ const Artists = () => {
             <li>
               <button
                 onClick={() => {
-<<<<<<< HEAD
-                  navigate("/artists/artworks");
-=======
                   navigate("/artists/");
->>>>>>> origin/final-Attia
                 }}
                 className="is-drawer-close:tooltip is-drawer-close:tooltip-right"
                 data-tip="Artworks"

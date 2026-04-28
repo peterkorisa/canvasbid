@@ -38,8 +38,8 @@ const LoginForm = ({ toggleTheme, theme }) => {
         console.log("➡️ Redirecting to /admin");
         navigate("/admin");
       } else if (role === "Artist") {
-        console.log("➡️ Redirecting to /artists/artworks");
-        navigate("/artists/artworks");
+        console.log("➡️ Redirecting to /artists/");
+        navigate("/artists/");
       } else {
         console.log("➡️ Redirecting to /artworks");
         navigate("/artworks");

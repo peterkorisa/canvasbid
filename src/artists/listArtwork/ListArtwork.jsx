@@ -23,7 +23,7 @@ const ListArtwork = ({ tags }) => {
           pendingArtworks = JSON.parse(localStorage.getItem('artistPendingArtworks') || '[]');
           
           // Filter out any pending artworks that have been approved (i.e. their ID is now in the approved list)
-          const approvedIds = new Set(approvedArtworks.map(art => art.artworkId || art.id));
+          const approvedIds = new Set(approvedArtworks.map(art =>  art.artworkId || art.id));
           pendingArtworks = pendingArtworks.filter(pendingArt => !approvedIds.has(pendingArt.artworkId || pendingArt.id));
           
           // Update local storage to remove approved ones

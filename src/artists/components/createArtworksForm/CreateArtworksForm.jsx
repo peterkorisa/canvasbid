@@ -35,7 +35,7 @@ const CreateArtworksForm = ({ tags }) => {
       );
 
       alert("Artwork created successfully!");
-      navigate("/artists/artworks");
+      navigate("/artists/");
     } catch (err) {
       alert("Failed to create artwork: " + (err.message || "Unknown error"));
     } finally {
