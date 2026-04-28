@@ -37,10 +37,7 @@ const RegisterForm = () => {
     try {
       const result = await authService.register(email, password, fullName, role);
       setSuccess("Registration successful! Redirecting to login...");
-      
-      setTimeout(() => {
-        navigate("/login");
-      }, 2000);
+      navigate("/login");
     } catch (err) {
       setError(err.message || "Registration failed. Please try again.");
     } finally {

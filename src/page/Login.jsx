@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import Navbar from "../component/Navbar";
 import { authService } from "../services/authService";
 import { getUserRole } from "../services/api";
+import { getAccessToken } from "../services/tokenService";
 import { LoadingSpinner } from "../component/LoadingSpinner";
 
 const LoginForm = ({ toggleTheme, theme }) => {
@@ -18,20 +19,34 @@ const LoginForm = ({ toggleTheme, theme }) => {
     setLoading(true);
 
     try {
+      console.log("🚀 handleSubmit: Starting login...");
       const result = await authService.login(email, password);
       
+      // Verify token was actually saved
+      const token = getAccessToken();
+      console.log("🔍 After login, token in storage:", token ? "✅ YES" : "❌ NO");
+      
+      if (!token) {
+        throw new Error("❌ Token was not saved to storage. Cannot proceed.");
+      }
+
       // Redirect based on user role
       const role = getUserRole();
+      console.log("👤 User role:", role);
+      
       if (role === "Admin") {
+        console.log("➡️ Redirecting to /admin");
         navigate("/admin");
       } else if (role === "Artist") {
+        console.log("➡️ Redirecting to /artists/artworks");
         navigate("/artists/artworks");
       } else {
+        console.log("➡️ Redirecting to /artworks");
         navigate("/artworks");
       }
     } catch (err) {
       const errorMsg = err.message || "Login failed. Please check your credentials.";
-      console.error("Login error details:", {
+      console.error("❌ Login error details:", {
         message: errorMsg,
         error: err,
         baseUrl: "https://app-260421214011.azurewebsites.net/api",

@@ -70,11 +70,22 @@ export const apiCall = async (
 
     // Handle server errors
     if (!response.ok) {
-      const errorData = await response.json();
-      const errorMessage =
-        errorData.message ||
-        errorData.error ||
-        `API Error: ${response.status} ${response.statusText}`;
+      if (response.status === 403) {
+        throw new Error("Access Denied: Your account may be pending admin approval, or you do not have permission to view this.");
+      }
+      
+      let errorMessage = `API Error: ${response.status} ${response.statusText}`;
+      try {
+        const errorData = await response.json();
+        if (errorData.errors) {
+          const firstKey = Object.keys(errorData.errors)[0];
+          errorMessage = Array.isArray(errorData.errors[firstKey]) ? errorData.errors[firstKey][0] : errorData.errors[firstKey];
+        } else {
+          errorMessage = errorData.message || errorData.error || errorData.title || errorMessage;
+        }
+      } catch (e) {
+        // Ignored if not JSON
+      }
       throw new Error(errorMessage);
     }
 

@@ -2,13 +2,10 @@
 
 import PendingArtworksTable from "../../components/pendingArtworksTable/PendingArtworksTable";
 
-const Artworks = ({ pendingArtworks, setPendingArtworks }) => {
+const Artworks = () => {
   return (
     <div>
-      <PendingArtworksTable
-        pendingArtworks={pendingArtworks}
-        setPendingArtworks={setPendingArtworks}
-      />
+      <PendingArtworksTable />
     </div>
   );
 };

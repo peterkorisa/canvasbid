@@ -7,11 +7,11 @@ const ArtworksCard = ({ artwork, tags, setArtworks, artworks }) => {
         <img
           className="sm:w-55 w-40 "
           src={
-            artwork.images[0] instanceof File
+            artwork.images && artwork.images[0] instanceof File
               ? URL.createObjectURL(artwork.images[0])
-              : artwork.images[0]
+              : (artwork.images && artwork.images[0]) || artwork.image || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=150'
           }
-          alt="Movie"
+          alt={artwork.title || "Artwork"}
         />
       </figure>
       <div className="card-body items-start flex-1">
@@ -39,11 +39,11 @@ const ArtworksCard = ({ artwork, tags, setArtworks, artworks }) => {
         </div>
         <div className="flex flex-row gap-1 items-center">
           <p className="text-base font-semibold">Tags:</p>
-          {artwork.tags.map((tag, index) => (
+          {(artwork.tags || []).map((tag, index) => (
             <div key={index}>
               <p className="font-normal">
-                {tag}
-                {index != artwork.tags.length - 1 && ","}
+                {tag?.tagName || tag}
+                {index !== (artwork.tags || []).length - 1 && ","}
               </p>
             </div>
           ))}

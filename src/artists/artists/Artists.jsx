@@ -60,7 +60,7 @@ const Artists = () => {
             <li>
               <button
                 onClick={() => {
-                  navigate("/artist/");
+                  navigate("/artists/artworks");
                 }}
                 className="is-drawer-close:tooltip is-drawer-close:tooltip-right"
                 data-tip="Artworks"
@@ -74,7 +74,7 @@ const Artists = () => {
             <li>
               <button
                 onClick={() => {
-                  navigate("/artist/create_artwork");
+                  navigate("/artists/create");
                 }}
                 className="is-drawer-close:tooltip is-drawer-close:tooltip-right"
                 data-tip="Create artwork"

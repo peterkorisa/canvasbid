@@ -1,27 +1,46 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { artworkService } from "../../../services/artworkService";
 
-const CreateArtworksForm = ({ tags, setArtworks }) => {
-  const handleSubmit = (e) => {
+const CreateArtworksForm = ({ tags }) => {
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const data = {
-      ...formData,
-      id: crypto.randomUUID(),
-      artistName: "Omar Adel",
-      status: "pending",
-    };
-    setArtworks((prev) => [...prev, data]);
-    //send artWorks to backend
-    setFormData({
-      title: "",
-      description: "",
-      initialPrice: "",
-      auctionStartTime: "",
-      auctionEndTime: "",
-      category: "Pick a color",
-      tags: [],
-      images: [],
-    });
-    alert("Artwork created successfully")
+    setLoading(true);
+
+    try {
+      let imageBase64 = "";
+      if (formData.images && formData.images.length > 0) {
+        // Convert first image to base64
+        const file = formData.images[0];
+        imageBase64 = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.readAsDataURL(file);
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = (error) => reject(error);
+        });
+      }
+
+      await artworkService.create(
+        formData.title,
+        formData.description,
+        parseFloat(formData.initialPrice) || 0,
+        parseFloat(formData.initialPrice) * 1.5 || 0, // Placeholder buyNowPrice
+        formData.category,
+        imageBase64,
+        formData.auctionStartTime,
+        formData.auctionEndTime
+      );
+
+      alert("Artwork created successfully!");
+      navigate("/artists/artworks");
+    } catch (err) {
+      alert("Failed to create artwork: " + (err.message || "Unknown error"));
+    } finally {
+      setLoading(false);
+    }
   };
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -182,8 +201,8 @@ const CreateArtworksForm = ({ tags, setArtworks }) => {
         </div>
       </div>
       <div className="mt-3 flex justify-center w-full">
-        <button type="submit" className="btn !bg-[#FF9E0C] text-white">
-          Submit
+        <button type="submit" disabled={loading} className="btn !bg-[#FF9E0C] text-white">
+          {loading ? "Submitting..." : "Submit"}
         </button>
       </div>
     </form>
