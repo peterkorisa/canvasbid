@@ -10,6 +10,8 @@ import {
   getUserRoleFromToken,
 } from "./tokenService";
 
+// Change this to local backend so the new endpoints work!
+// const BASE_URL = "https://localhost:7028/api";
 const BASE_URL = "https://app-260421214011.azurewebsites.net/api";
 
 // Flag to prevent multiple simultaneous refresh attempts
@@ -89,8 +91,14 @@ export const apiCall = async (
       throw new Error(errorMessage);
     }
 
-    const data = await response.json();
-    return data;
+    const textData = await response.text();
+    if (!textData) return null;
+    
+    try {
+      return JSON.parse(textData);
+    } catch (e) {
+      return textData; // Return as plain text if not JSON
+    }
   } catch (error) {
     console.error("API Error:", error.message);
     throw error;

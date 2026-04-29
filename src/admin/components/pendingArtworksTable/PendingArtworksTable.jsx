@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { artworkService } from "../../../services/artworkService";
 import { LoadingSpinner } from "../../../component/LoadingSpinner";
+import { formatImage } from "../../../utils/imageUtils";
 
 const PendingArtworksTable = () => {
   const [pendingArtworks, setPendingArtworks] = useState([]);
@@ -80,7 +81,7 @@ const PendingArtworksTable = () => {
                       <div className="avatar">
                         <div className="mask mask-squircle h-16 w-16 bg-gray-200">
                           <img
-                            src={art.image || art.images?.[0] || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=150'}
+                            src={formatImage(art.image || art.images?.[0], 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=150')}
                             alt={art.title}
                             className="object-cover"
                           />

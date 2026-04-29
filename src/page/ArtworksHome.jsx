@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import Navbar from "../component/Navbar";
 import SearchBar from "../component/search_bar/Search_bar";
 import ProductCard from "../component/prodect_card/Product_card";
@@ -9,6 +10,7 @@ const ArtworksHome = () => {
   const [artworks, setArtworks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const location = useLocation();
 
   useEffect(() => {
     const fetchArtworks = async () => {
@@ -26,6 +28,23 @@ const ArtworksHome = () => {
 
     fetchArtworks();
   }, []);
+
+  const searchParams = new URLSearchParams(location.search);
+  const query = searchParams.get("q")?.toLowerCase() || "";
+  const category = searchParams.get("category")?.toLowerCase() || "";
+  const tagsParam = searchParams.get("tags") || "";
+  const tagsArray = tagsParam ? tagsParam.split(",").map(t => t.toLowerCase()) : [];
+
+  const filteredArtworks = artworks.filter((artwork) => {
+    if (query && !artwork.title?.toLowerCase().includes(query)) return false;
+    if (category && artwork.category?.toLowerCase() !== category.toLowerCase()) return false;
+    if (tagsArray.length > 0) {
+      const artworkTags = (artwork.tags || []).map(t => typeof t === 'string' ? t.toLowerCase() : (t.tagName?.toLowerCase() || ""));
+      const hasTag = tagsArray.some(tag => artworkTags.includes(tag));
+      if (!hasTag) return false;
+    }
+    return true;
+  });
 
   if (loading) {
     return (
@@ -49,7 +68,7 @@ const ArtworksHome = () => {
         </div>
       )}
 
-      {artworks.length === 0 ? (
+      {filteredArtworks.length === 0 ? (
         <div className="flex justify-center items-center py-20">
           <p className="text-gray-500 dark:text-gray-400 text-lg">
             No artworks available yet.
@@ -57,10 +76,10 @@ const ArtworksHome = () => {
         </div>
       ) : (
         <div className="flex flex-wrap justify-center gap-6 mt-10 px-4 pb-10">
-          {artworks.map((artwork) => (
+          {filteredArtworks.map((artwork) => (
             <ProductCard
-              key={artwork.artworkId}
-              id={artwork.artworkId}
+              key={artwork.artworkId || artwork.id}
+              id={artwork.artworkId || artwork.id}
               title={artwork.title}
               image={artwork.image || "https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"}
             />

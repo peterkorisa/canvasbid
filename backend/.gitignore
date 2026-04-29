@@ -1,0 +1,39 @@
+# Build outputs
+/bin/
+/obj/
+**/bin/
+**/obj/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# IDE folders
+.vs/
+.idea/
+.vscode/
+
+# Logs and runtime files
+*.log
+
+# Test and coverage output
+TestResults/
+*.trx
+coverage/
+
+# NuGet
+*.nupkg
+*.snupkg
+
+# Local environment / secrets
+.env
+.env.*
+appsettings.Local.json
+appsettings.*.local.json
+
+# OS filesS
+.DS_Store
+Thumbs.db
+canvasBid/bin/*

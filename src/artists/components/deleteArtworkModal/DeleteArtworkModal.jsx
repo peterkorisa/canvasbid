@@ -1,11 +1,31 @@
 import React, { useRef } from "react";
+import { artworkService } from "../../../services/artworkService";
 
 const DeleteArtworkModal = ({ artwork, setArtworks }) => {
   const modalRef = useRef(null);
-  const handleDeleteAccept = () => {
-    //send deletedArtwork to backend
-    setArtworks((prev) => prev.filter((a) => a.id !== artwork.id));
-    modalRef.current.close();
+  const handleDeleteAccept = async () => {
+    try {
+      const targetId = artwork.artworkId || artwork.id;
+      
+      // If it's a locally generated fake pending ID, do not call the backend.
+      const isPendingLocalOnly = typeof targetId === 'string' && targetId.startsWith('pending-');
+
+      if (targetId && !isPendingLocalOnly) {
+        await artworkService.delete(targetId);
+      }
+      
+      // Update local state
+      setArtworks((prev) => prev.filter((a) => (a.artworkId || a.id) !== targetId));
+      
+      // Update local storage
+      const pendingArtworks = JSON.parse(localStorage.getItem('artistPendingArtworks') || '[]');
+      const updatedPending = pendingArtworks.filter(a => (a.artworkId || a.id) !== targetId);
+      localStorage.setItem('artistPendingArtworks', JSON.stringify(updatedPending));
+      
+      modalRef.current.close();
+    } catch (error) {
+      alert("Failed to delete artwork: " + error.message);
+    }
   };
 
   return (

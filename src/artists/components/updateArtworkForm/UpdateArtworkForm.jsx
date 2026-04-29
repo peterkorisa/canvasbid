@@ -1,32 +1,74 @@
+import { useState } from "react";
+import { artworkService } from "../../../services/artworkService";
+
 const UpdateArtworkForm = ({ tags, artwork, setArtworks,modalRef}) => {
-  const handleSubmit = (e) => {
+  const [loading, setLoading] = useState(false);
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // const updatedArtwork = artworks.find((a) => a.id === artwork.id);
-    // send updatedArtwork to backend
-    modalRef.current.close();
+    setLoading(true);
+    try {
+      const targetId = artwork.id || artwork.artworkId;
+      
+      let imageBase64 = artwork.image || null;
+      if (artwork.images && artwork.images.length > 0 && artwork.images[0] instanceof File) {
+        imageBase64 = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.readAsDataURL(artwork.images[0]);
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = (error) => reject(error);
+        });
+      }
+
+      if (targetId) {
+        await artworkService.update(
+          targetId,
+          artwork.title,
+          artwork.discreption || artwork.description,
+          parseFloat(artwork.initialPrice || artwork.intialPrice) || 0,
+          (parseFloat(artwork.initialPrice || artwork.intialPrice) || 0) * 1.5,
+          artwork.category,
+          imageBase64
+        );
+      }
+      
+      // Update local storage if it's pending
+      const pendingArtworks = JSON.parse(localStorage.getItem('artistPendingArtworks') || '[]');
+      const index = pendingArtworks.findIndex(a => (a.id || a.artworkId) === targetId);
+      if (index !== -1) {
+        pendingArtworks[index] = artwork;
+        localStorage.setItem('artistPendingArtworks', JSON.stringify(pendingArtworks));
+      }
+
+      modalRef.current.close();
+    } catch (error) {
+      alert("Failed to update artwork: " + error.message);
+    } finally {
+      setLoading(false);
+    }
   };
   const handleChange = (e) => {
     setArtworks((prev) =>
       prev.map((art) =>
-        art.id == artwork.id
+        (art.id || art.artworkId) == (artwork.id || artwork.artworkId)
           ? { ...art, [e.target.name]: e.target.value }
           : art,
       ),
     );
   };
   const handleTagChange = (tag) => {
-    if (artwork.tags.includes(tag)) {
+    const currentTags = (artwork.tags || artwork.artworkTags || []).map(t => typeof t === 'string' ? t : t.tagName);
+    if (currentTags.includes(tag)) {
       setArtworks((prev) =>
         prev.map((art) =>
-          art.id == artwork.id
-            ? { ...art, tags: art.tags.filter((t) => t != tag) }
+          (art.id || art.artworkId) == (artwork.id || artwork.artworkId)
+            ? { ...art, tags: currentTags.filter((t) => t != tag) }
             : art,
         ),
       );
     } else {
       setArtworks((prev) =>
         prev.map((art) =>
-          art.id == artwork.id ? { ...art, tags: [...art.tags, tag] } : art,
+          (art.id || art.artworkId) == (artwork.id || artwork.artworkId) ? { ...art, tags: [...currentTags, tag] } : art,
         ),
       );
     }
@@ -35,8 +77,8 @@ const UpdateArtworkForm = ({ tags, artwork, setArtworks,modalRef}) => {
     const files = Array.from(e.target.files);
     setArtworks((prev) =>
       prev.map((art) =>
-        art.id == artwork.id
-          ? { ...art, images: [...art.images, ...files] }
+        (art.id || art.artworkId) == (artwork.id || artwork.artworkId)
+          ? { ...art, images: [...(art.images || []), ...files] }
           : art,
       ),
     );
@@ -57,7 +99,7 @@ const UpdateArtworkForm = ({ tags, artwork, setArtworks,modalRef}) => {
               type="text"
               className="input text-black input-secondary bg-secondary placeholder:text-base-300"
               placeholder="Type here"
-              value={artwork.title}
+              value={artwork.title || ""}
               onChange={(e) => handleChange(e)}
             />
           </fieldset>
@@ -68,11 +110,11 @@ const UpdateArtworkForm = ({ tags, artwork, setArtworks,modalRef}) => {
               Enter artwork's description
             </legend>
             <input
-              name="description"
+              name="discreption"
               type="text"
               className="input text-black input-secondary bg-secondary placeholder:text-base-300"
               placeholder="Type here"
-              value={artwork.description}
+              value={artwork.discreption || artwork.description || ""}
               onChange={(e) => handleChange(e)}
             />
           </fieldset>
@@ -85,11 +127,11 @@ const UpdateArtworkForm = ({ tags, artwork, setArtworks,modalRef}) => {
               Enter artwork's initial price
             </legend>
             <input
-              name="initialPrice"
+              name="intialPrice"
               type="number"
               className="input text-black input-secondary bg-secondary placeholder:text-base-300"
               placeholder="Type here"
-              value={artwork.initialPrice}
+              value={artwork.intialPrice || artwork.initialPrice || ""}
               onChange={(e) => handleChange(e)}
             />
           </fieldset>
@@ -103,7 +145,7 @@ const UpdateArtworkForm = ({ tags, artwork, setArtworks,modalRef}) => {
             <select
               className="select text-black input-secondary bg-secondary"
               name="category"
-              value={artwork.category}
+              value={artwork.category || "Pick a color"}
               onChange={(e) => handleChange(e)}
             >
               <option disabled={true}>Pick a color</option>
@@ -122,10 +164,10 @@ const UpdateArtworkForm = ({ tags, artwork, setArtworks,modalRef}) => {
               Enter artwork's start time
             </legend>
             <input
-              name="auctionStartTime"
+              name="startTime"
               type="datetime-local"
               className="input min-w-0 w-full text-black input-secondary bg-secondary"
-              value={artwork.auctionStartTime}
+              value={artwork.startTime || artwork.auctionStartTime || ""}
               onChange={(e) => handleChange(e)}
             />
           </fieldset>
@@ -136,10 +178,10 @@ const UpdateArtworkForm = ({ tags, artwork, setArtworks,modalRef}) => {
               Enter artwork's end time
             </legend>
             <input
-              name="auctionEndTime"
+              name="endTime"
               type="datetime-local"
               className="input min-w-0 w-full text-black placeholder: input-secondary bg-secondary"
-              value={artwork.auctionEndTime}
+              value={artwork.endTime || artwork.auctionEndTime || ""}
               onChange={(e) => handleChange(e, artwork.id)}
             />
           </fieldset>
@@ -155,7 +197,7 @@ const UpdateArtworkForm = ({ tags, artwork, setArtworks,modalRef}) => {
                   name="tags"
                   type="checkbox"
                   className="checkbox  checkbox-secondary"
-                  checked={artwork.tags.includes(tag)}
+                  checked={(artwork.tags || artwork.artworkTags || []).map(t => typeof t === 'string' ? t : t.tagName).includes(tag)}
                   onChange={() => handleTagChange(tag)}
                 />
                 {tag}
@@ -175,8 +217,8 @@ const UpdateArtworkForm = ({ tags, artwork, setArtworks,modalRef}) => {
         </div>
       </div>
       <div className="mt-9 flex justify-center w-full">
-        <button type="submit" className="btn !bg-[#FF9E0C] ">
-          Submit
+        <button type="submit" disabled={loading} className="btn !bg-[#FF9E0C] ">
+          {loading ? "Submitting..." : "Submit"}
         </button>
       </div>
     </form>

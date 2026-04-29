@@ -1,4 +1,4 @@
-import { apiCall } from "./api";
+import { apiCall, getUser } from "./api";
 
 export const artworkService = {
   create: async (title, description, initialPrice, buyNowPrice, category, image, startTime, endTime) => {
@@ -17,6 +17,7 @@ export const artworkService = {
       "POST",
       {
         title,
+        description,
         discreption: description,
         intialPrice: initialPrice,
         buyNowPrice,
@@ -32,7 +33,9 @@ export const artworkService = {
     try {
       const pendingArtworks = JSON.parse(localStorage.getItem('artistPendingArtworks') || '[]');
       // Assuming backend returns status as an integer (e.g. 0 for Pending), we explicitly set it to 'Pending' for UI
-      const artworkToSave = { ...newArtwork, status: 'Pending', tags: [], images: [image] };
+      const user = getUser();
+      const userName = user?.name || user?.username || "You";
+      const artworkToSave = { ...newArtwork, ownerName: newArtwork.ownerName || userName, status: 'Pending', tags: [], images: [image] };
       pendingArtworks.push(artworkToSave);
       localStorage.setItem('artistPendingArtworks', JSON.stringify(pendingArtworks));
     } catch(e) {
@@ -54,7 +57,15 @@ export const artworkService = {
 
   // Get single artwork by ID
   getById: async (id) => {
-    return await apiCall(`/Artwork/${id}`, "GET", null, true);
+    try {
+      return await apiCall(`/Artwork/${id}`, "GET", null, true);
+    } catch (error) {
+      console.warn("GET /Artwork/:id failed. Falling back to fetching all artworks.", error);
+      const allArtworks = await apiCall("/Artwork", "GET", null, true);
+      const artwork = allArtworks.find(a => String(a.artworkId) === String(id) || String(a.id) === String(id));
+      if (!artwork) throw new Error("Artwork not found");
+      return artwork;
+    }
   },
 
   // Update artwork
@@ -64,6 +75,7 @@ export const artworkService = {
       "PUT",
       {
         title,
+        description,
         discreption: description,
         intialPrice: initialPrice,
         buyNowPrice,
@@ -96,6 +108,11 @@ export const artworkService = {
     return await apiCall(endpoint, "GET", null, true);
   },
 
+  // Get current artist's artworks
+  getMyArtworks: async () => {
+    return await apiCall("/Artwork/myartworks", "GET", null, true);
+  },
+
   // Add artwork to watchlist
   addToWatchlist: async (artworkId) => {
     return await apiCall(`/Artwork/watchlist/${artworkId}`, "POST", {}, true);
@@ -108,7 +125,15 @@ export const artworkService = {
 
   // Remove artwork from watchlist
   removeFromWatchlist: async (artworkId) => {
-    return await apiCall(`/Artwork/watchlist/${artworkId}`, "DELETE", null, true);
+    try {
+      return await apiCall(`/Artwork/watchlist/${artworkId}`, "DELETE", null, true);
+    } catch (e) {
+      if (e.message.includes("405") || e.message.includes("404")) {
+        // Try query string with id or artworkId
+        return await apiCall(`/Artwork/watchlist?artworkId=${artworkId}&id=${artworkId}`, "DELETE", null, true);
+      }
+      throw e;
+    }
   },
 
   // Extend auction

@@ -68,7 +68,7 @@ const LoginForm = ({ toggleTheme, theme }) => {
   }
 
   return (
-    <>
+    <div className="min-h-[100vh]">
       <Navbar toggleTheme={toggleTheme} theme={theme} />
 
       <section className="bg-gray-50 dark:bg-gray-900 py-20 w-full">
@@ -157,7 +157,7 @@ const LoginForm = ({ toggleTheme, theme }) => {
 
         </div>
       </section>
-    </>
+    </div>
   );
 };
 

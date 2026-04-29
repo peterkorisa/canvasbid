@@ -16,6 +16,8 @@ import CreateArtwork from "./artists/createArtwork/CreateArtwork";
 import ArtworksHome from "./page/ArtworksHome";
 import Watchlist from "./page/Watchlist";
 import { ErrorProvider } from "./component/ErrorDialog";
+import ProtectedRoute from "./component/ProtectedRoute";
+import ErrorPage from "./page/ErrorPage";
 
 function App() {
   const tags = [
@@ -40,19 +42,25 @@ function App() {
           <Route path="/login" element={<LoginForm />} />
           <Route path="/register" element={<RegisterForm />} />
           {/* Admin Routes */}
-          <Route path="/admin/" element={<Dashboard />}>
-            <Route index element={<AdminMain />} />
-            <Route path="artworks" element={<Artworks />} />
-            <Route path="users" element={<Users />} />
+          <Route path="/admin/" element={<ProtectedRoute allowedRoles={["Admin"]} />}>
+            <Route element={<Dashboard />}>
+              <Route index element={<AdminMain />} />
+              <Route path="artworks" element={<Artworks />} />
+              <Route path="users" element={<Users />} />
+            </Route>
           </Route>
           {/* Artist Routes */}
-          <Route path="/artists/" element={<Artists />}>
-            <Route path="" element={<ListArtwork tags={tags} />} />
-            <Route path="create" element={<CreateArtwork tags={tags} />} />
+          <Route path="/artists/" element={<ProtectedRoute allowedRoles={["Artist"]} />}>
+            <Route element={<Artists />}>
+              <Route path="" element={<ListArtwork tags={tags} />} />
+              <Route path="create" element={<CreateArtwork tags={tags} />} />
+            </Route>
           </Route>
           <Route path="/artworks" element={<ArtworksHome />} />
           <Route path="/watchlist" element={<Watchlist />} />
           <Route path="/product/:id" element={<Productpage />} />
+          <Route path="/error" element={<ErrorPage />} />
+          <Route path="*" element={<ErrorPage />} />
         </Routes>
       </div>
     </ErrorProvider>

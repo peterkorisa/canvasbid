@@ -14,8 +14,8 @@ const ListArtwork = ({ tags }) => {
     const fetchArtworks = async () => {
       try {
         setLoading(true);
-        const userId = getUserIdFromToken();
-        const data = await artworkService.filter({ artist: userId });
+        // Fetch the artist's artworks using the new endpoint
+        const data = await artworkService.getMyArtworks();
         const approvedArtworks = Array.isArray(data) ? data : [];
         
         let pendingArtworks = [];
@@ -65,9 +65,9 @@ const ListArtwork = ({ tags }) => {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-      {artworks.map((artwork) => (
+      {artworks.map((artwork, index) => (
         <ArtworksCard
-          key={artwork.artworkId || artwork.id}
+          key={artwork.artworkId || artwork.id || artwork._id || `artwork-${index}`}
           artworks={artworks}
           artwork={artwork}
           setArtworks={setArtworks}

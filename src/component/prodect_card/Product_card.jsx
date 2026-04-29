@@ -1,12 +1,13 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { formatImage } from "../../utils/imageUtils";
 
 const ProductCard = ({ id, title, image }) => {
   return (
     <Link to={`/product/${id}`} className="hover:scale-105 transition-transform">
       <div className="card bg-base-100 w-96 shadow-sm cursor-pointer">
         <figure>
-          <img src={image} alt={title} className="rounded-lg" />
+          <img src={formatImage(image, "https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp")} alt={title} className="rounded-lg" />
         </figure>
 
         <div className="card-body">

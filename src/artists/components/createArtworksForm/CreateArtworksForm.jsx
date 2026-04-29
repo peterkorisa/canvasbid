@@ -8,6 +8,37 @@ const CreateArtworksForm = ({ tags }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const { title, description, initialPrice, category, auctionStartTime, auctionEndTime, images } = formData;
+    
+    // Check if all fields are filled
+    if (!title || !description || !initialPrice || !category || category === "Pick a color" || !auctionStartTime || !auctionEndTime) {
+      alert("Please fill in all required fields.");
+      return;
+    }
+
+    // Check if images are uploaded
+    if (!images || images.length === 0) {
+      alert("Please upload at least one image.");
+      return;
+    }
+
+    // Validate times
+    const start = new Date(auctionStartTime);
+    const end = new Date(auctionEndTime);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (start < today) {
+      alert("Auction start time cannot be before today.");
+      return;
+    }
+
+    if (start >= end) {
+      alert("Auction start time must be before the end time.");
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -47,7 +78,7 @@ const CreateArtworksForm = ({ tags }) => {
   };
   const handleTagChange = (tag) => {
     if (formData.tags.includes(tag)) {
-      setFormData({ ...formData, tags: tags.filter((t) => t !== tag) });
+      setFormData({ ...formData, tags: formData.tags.filter((t) => t !== tag) });
     } else {
       setFormData({ ...formData, tags: [...formData.tags, tag] });
     }
@@ -194,7 +225,6 @@ const CreateArtworksForm = ({ tags }) => {
           <input
             name="images"
             type="file"
-            multiple
             className="file-input file-input-secondary text-black"
             onChange={(e) => handleFileChange(e)}
           />

@@ -21,16 +21,12 @@ const SearchBar = () => {
   const navigate = useNavigate();
 
   const handleSearch = () => {
-    if (query.trim() !== "") {
-      const url = `/search?q=${encodeURIComponent(query)}${
-        category ? `&category=${encodeURIComponent(category)}` : ""
-      }${
-        selectedTags.length > 0
-          ? `&tags=${encodeURIComponent(selectedTags.join(","))}`
-          : ""
-      }`;
-      navigate(url);
-    }
+    const params = new URLSearchParams();
+    if (query.trim()) params.append("q", query.trim());
+    if (category) params.append("category", category);
+    if (selectedTags.length > 0) params.append("tags", selectedTags.join(","));
+    
+    navigate(`/artworks?${params.toString()}`);
   };
 
   const handleKeyPress = (e) => {
