@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { artworkService } from "../../../services/artworkService";
 
-const UpdateArtworkForm = ({ tags, artwork, setArtworks,modalRef}) => {
+const UpdateArtworkForm = ({ tags, artwork, setArtworks, modalRef }) => {
   const [loading, setLoading] = useState(false);
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
       const targetId = artwork.id || artwork.artworkId;
-      
+
       let imageBase64 = artwork.image || null;
       if (artwork.images && artwork.images.length > 0 && artwork.images[0] instanceof File) {
         imageBase64 = await new Promise((resolve, reject) => {
@@ -30,7 +30,7 @@ const UpdateArtworkForm = ({ tags, artwork, setArtworks,modalRef}) => {
           imageBase64
         );
       }
-      
+
       // Update local storage if it's pending
       const pendingArtworks = JSON.parse(localStorage.getItem('artistPendingArtworks') || '[]');
       const index = pendingArtworks.findIndex(a => (a.id || a.artworkId) === targetId);

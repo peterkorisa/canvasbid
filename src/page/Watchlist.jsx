@@ -106,7 +106,7 @@ const Watchlist = () => {
                   <ProductCard
                     id={item.artworkId}
                     title={item.title}
-                    image={item.image || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080'}
+                    image={item.image}
                   />
                   <button
                     onClick={() => handleRemove(item.artworkId)}

@@ -38,7 +38,7 @@ export const artworkService = {
       const artworkToSave = { ...newArtwork, ownerName: newArtwork.ownerName || userName, status: 'Pending', tags: [], images: [image] };
       pendingArtworks.push(artworkToSave);
       localStorage.setItem('artistPendingArtworks', JSON.stringify(pendingArtworks));
-    } catch(e) {
+    } catch (e) {
       console.error("Failed to save pending artwork to local storage", e);
     }
 

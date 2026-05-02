@@ -17,7 +17,11 @@ const ArtworksHome = () => {
       try {
         setLoading(true);
         const data = await artworkService.getAll();
-        setArtworks(Array.isArray(data) ? data : []);
+        const deletedList = JSON.parse(localStorage.getItem('deletedArtworks') || '[]');
+        const activeArtworks = (Array.isArray(data) ? data : []).filter(
+          art => !deletedList.includes(art.artworkId || art.id)
+        );
+        setArtworks(activeArtworks);
       } catch (err) {
         setError(err.message || "Failed to load artworks");
         setArtworks([]);

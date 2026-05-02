@@ -3,7 +3,7 @@ import DeleteArtworkModal from "./../deleteArtworkModal/DeleteArtworkModal";
 import { formatImage } from "../../../utils/imageUtils";
 
 const ArtworksCard = ({ artwork, tags, setArtworks, artworks }) => {
-  console.log(artwork)  ;
+  console.log(artwork);
   return (
     <div className="card card-side shadow-sm bg-[#0000a1] ">
       <figure>

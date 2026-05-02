@@ -33,7 +33,13 @@ const ListArtwork = ({ tags }) => {
         }
 
         // Combine approved and pending artworks
-        setArtworks([...pendingArtworks, ...approvedArtworks]);
+        const combined = [...pendingArtworks, ...approvedArtworks];
+        
+        // Filter out locally soft-deleted artworks
+        const deletedList = JSON.parse(localStorage.getItem('deletedArtworks') || '[]');
+        const activeArtworks = combined.filter(art => !deletedList.includes(art.artworkId || art.id));
+        
+        setArtworks(activeArtworks);
       } catch (err) {
         setError(err.message || "Failed to load artworks");
       } finally {

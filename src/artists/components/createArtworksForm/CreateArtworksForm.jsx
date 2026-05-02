@@ -10,7 +10,7 @@ const CreateArtworksForm = ({ tags }) => {
     e.preventDefault();
 
     const { title, description, initialPrice, category, auctionStartTime, auctionEndTime, images } = formData;
-    
+
     // Check if all fields are filled
     if (!title || !description || !initialPrice || !category || category === "Pick a color" || !auctionStartTime || !auctionEndTime) {
       alert("Please fill in all required fields.");
@@ -85,7 +85,7 @@ const CreateArtworksForm = ({ tags }) => {
   };
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
-  
+
     setFormData({ ...formData, images: [...formData.images, ...files] });
   };
   const [formData, setFormData] = useState({
