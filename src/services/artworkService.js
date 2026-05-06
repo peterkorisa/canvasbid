@@ -22,9 +22,9 @@ export const artworkService = {
         intialPrice: initialPrice,
         buyNowPrice,
         category,
-        Image: base64Image,
-        StartTime: startTime ? new Date(startTime).toISOString() : null,
-        EndTime: endTime ? new Date(endTime).toISOString() : null
+        image: base64Image,
+        startTime: startTime ? new Date(startTime).toISOString() : null,
+        endTime: endTime ? new Date(endTime).toISOString() : null
       },
       true
     );
@@ -57,15 +57,12 @@ export const artworkService = {
 
   // Get single artwork by ID
   getById: async (id) => {
-    try {
-      return await apiCall(`/Artwork/${id}`, "GET", null, true);
-    } catch (error) {
-      console.warn("GET /Artwork/:id failed. Falling back to fetching all artworks.", error);
-      const allArtworks = await apiCall("/Artwork", "GET", null, true);
-      const artwork = allArtworks.find(a => String(a.artworkId) === String(id) || String(a.id) === String(id));
-      if (!artwork) throw new Error("Artwork not found");
-      return artwork;
-    }
+    // The backend does not support GET /Artwork/:id (returns 405 Method Not Allowed).
+    // So we fetch all artworks and filter by ID to avoid console errors.
+    const allArtworks = await apiCall("/Artwork", "GET", null, true);
+    const artwork = allArtworks.find(a => String(a.artworkId) === String(id) || String(a.id) === String(id));
+    if (!artwork) throw new Error("Artwork not found");
+    return artwork;
   },
 
   // Update artwork

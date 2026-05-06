@@ -18,6 +18,7 @@ import Watchlist from "./page/Watchlist";
 import { ErrorProvider } from "./component/ErrorDialog";
 import ProtectedRoute from "./component/ProtectedRoute";
 import ErrorPage from "./page/ErrorPage";
+import Notifications from "./page/Notifications";
 
 function App() {
   const tags = [
@@ -58,6 +59,7 @@ function App() {
           </Route>
           <Route path="/artworks" element={<ArtworksHome />} />
           <Route path="/watchlist" element={<Watchlist />} />
+          <Route path="/notifications" element={<Notifications />} />
           <Route path="/product/:id" element={<Productpage />} />
           <Route path="/error" element={<ErrorPage />} />
           <Route path="*" element={<ErrorPage />} />

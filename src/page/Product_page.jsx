@@ -25,7 +25,7 @@ const BidHistoryTable = ({ bids }) => {
             bids.map((bid, index) => (
               <tr key={index}>
                 <th>{index + 1}</th>
-                <td>{bid.userName || 'Anonymous'}</td>
+                <td>{bid.bidderName || bid.userName || 'Anonymous'}</td>
                 <td>${bid.amount?.toFixed(2) || bid.price?.toFixed(2) || '0.00'}</td>
                 <td>{bid.timeStamp ? new Date(bid.timeStamp).toLocaleString() : bid.timestamp}</td>
               </tr>
@@ -64,6 +64,9 @@ const Productpage = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isInWatchlist, setIsInWatchlist] = useState(false);
   const [watchlistLoading, setWatchlistLoading] = useState(false);
+  const [timeLeft, setTimeLeft] = useState('');
+  const [isAuctionClosed, setIsAuctionClosed] = useState(false);
+  const [closingAuction, setClosingAuction] = useState(false);
 
   useEffect(() => {
     setIsLoggedIn(!!getToken());
@@ -110,6 +113,94 @@ const Productpage = () => {
       fetchArtworkAndBids();
     }
   }, [id]);
+
+  // Countdown timer effect
+  useEffect(() => {
+    if (!product || !product.endTime) return;
+
+    const calculateTimeLeft = () => {
+      let dateStr = product.endTime;
+      // If the backend returns the date without timezone info, assume it is UTC 
+      // since we sent it via .toISOString() when creating the artwork
+      if (dateStr && !dateStr.endsWith('Z') && !dateStr.includes('+')) {
+        dateStr += 'Z';
+      }
+      const end = new Date(dateStr);
+      
+      // Handle C# DateTime.MinValue (0001-01-01) which means no date was set
+      if (end.getFullYear() <= 1) {
+        setTimeLeft('No End Time Set');
+        return true;
+      }
+
+      const endTimeMs = end.getTime();
+      const now = new Date().getTime();
+      const difference = endTimeMs - now;
+
+      if (difference <= 0) {
+        setTimeLeft('Auction Ended');
+        if (!isAuctionClosed && !closingAuction) {
+           setIsAuctionClosed(true);
+           setClosingAuction(true);
+           
+           const role = getUserRole();
+           // Only call backend if user is Admin or Artist to prevent 403 Forbidden errors
+           if (role === 'Admin' || role === 'Artist') {
+             bidService.closeAuction(id).then(() => {
+                console.log('Auction closed successfully');
+             }).catch((err) => {
+                if (err.message && err.message.includes("403")) {
+                  console.log('Auction ended. Waiting for server or admin to finalize.');
+                }
+             });
+           } else {
+             // For buyers, we can't close the auction via API, so we check locally if they won
+             const currentUser = getUser();
+             if (currentUser && currentUser.email && bidHistory && bidHistory.length > 0) {
+                const myName = currentUser.email.split("@")[0];
+                // Check both userName and bidderName since API uses bidderName
+                const topBid = bidHistory[bidHistory.length - 1] || bidHistory[0];
+                const topBidder = topBid?.bidderName || topBid?.userName;
+                
+                if (topBidder === myName || bidHistory.some(b => b.bidderName === myName || b.userName === myName)) {
+                   // Create a local notification for the buyer
+                   const localNotifs = JSON.parse(localStorage.getItem('localNotifications') || '[]');
+                   if (!localNotifs.some(n => n.artworkId === id)) {
+                      localNotifs.push({
+                         id: 'local_' + Date.now(),
+                         artworkId: id,
+                         title: 'Bid Won! 🎉',
+                         message: `Congratulations! You won the auction for "${product.title}"!`,
+                         createdAt: new Date().toISOString()
+                      });
+                      localStorage.setItem('localNotifications', JSON.stringify(localNotifs));
+                   }
+                }
+             }
+           }
+        }
+        return true; // ended
+      }
+
+      const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+      setTimeLeft(`${days > 0 ? days + 'd ' : ''}${hours}h ${minutes}m ${seconds}s`);
+      return false; // not ended
+    };
+
+    const isEnded = calculateTimeLeft();
+    if (isEnded) return;
+
+    const timer = setInterval(() => {
+      const ended = calculateTimeLeft();
+      if (ended) clearInterval(timer);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [product, isAuctionClosed, closingAuction, id, bidHistory]);
 
   const handlePlaceBid = async () => {
     if (!isLoggedIn) {
@@ -235,6 +326,15 @@ const Productpage = () => {
               <span className="text-gray-500 line-through">${product.buyNowPrice?.toFixed(2) || '0.00'}</span>
             </div>
 
+            {timeLeft && (
+              <div className="mb-4 p-4 rounded-lg bg-base-200 border border-base-300 shadow-sm inline-block">
+                <span className="text-sm uppercase tracking-wide font-bold text-gray-500">Time Left</span>
+                <div className={`text-2xl font-black ${isAuctionClosed ? 'text-red-500' : 'text-primary'}`}>
+                  {timeLeft}
+                </div>
+              </div>
+            )}
+
             <p className="text-gray-700 dark:text-gray-300 mb-6">{product.discreption || product.description}</p>
 
             {!isLoggedIn && (
@@ -254,17 +354,17 @@ const Productpage = () => {
                 value={bidAmount}
                 onChange={(e) => setBidAmount(e.target.value)}
                 placeholder={`Enter bid amount (minimum: $${(product.intialPrice + 10).toFixed(2)})`}
-                disabled={!isLoggedIn || bidLoading}
+                disabled={!isLoggedIn || bidLoading || isAuctionClosed}
                 className="w-full p-3 rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-lg disabled:opacity-50"
               />
             </div>
 
             <button
               onClick={handlePlaceBid}
-              disabled={!isLoggedIn || bidLoading}
+              disabled={!isLoggedIn || bidLoading || isAuctionClosed}
               className="!bg-indigo-600 text-white px-8 py-3 rounded-md text-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 w-full md:w-3/4 mt-auto disabled:bg-gray-400 disabled:cursor-not-allowed transition"
             >
-              {bidLoading ? 'Placing Bid...' : 'Place Bid'}
+              {isAuctionClosed ? 'Auction Closed' : bidLoading ? 'Placing Bid...' : 'Place Bid'}
             </button>
 
             <div className="flex gap-4 mt-4 w-full md:w-3/4">

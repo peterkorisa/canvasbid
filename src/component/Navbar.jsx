@@ -1,12 +1,15 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { getToken, removeToken, removeUser, getUserRole, getUser } from "../services/api";
 import { authService } from "../services/authService";
+import { notificationService } from "../services/notificationService";
 
 const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userRole, setUserRole] = useState(null);
   const [userName, setUserName] = useState("");
+  const [toastNotification, setToastNotification] = useState(null);
+  const prevCountRef = useRef(-1);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -21,6 +24,55 @@ const Navbar = () => {
       }
     }
   }, []);
+
+  // Polling for notifications
+  useEffect(() => {
+    if (!isLoggedIn || userRole !== "Buyer") return;
+
+    let isMounted = true;
+    
+    const fetchNotifs = async () => {
+      try {
+        const response = await notificationService.getNotifications();
+        let dataToSet = [];
+        if (Array.isArray(response)) {
+          dataToSet = response;
+        } else if (response && Array.isArray(response.data)) {
+          dataToSet = response.data;
+        } else if (response && Array.isArray(response.notifications)) {
+          dataToSet = response.notifications;
+        } else if (response && typeof response === 'object') {
+          dataToSet = [response];
+        } else if (response && typeof response === 'string') {
+          dataToSet = [{ message: response }];
+        }
+
+        if (isMounted) {
+           const prevCount = prevCountRef.current;
+           if (dataToSet.length > prevCount && prevCount !== -1) {
+              // New notification!
+              const newNotif = dataToSet[dataToSet.length - 1]; 
+              setToastNotification(newNotif);
+              // Hide toast after 5 seconds
+              setTimeout(() => {
+                if (isMounted) setToastNotification(null);
+              }, 5000);
+           }
+           prevCountRef.current = dataToSet.length;
+        }
+      } catch (err) {
+        // Silently ignore polling errors
+      }
+    };
+
+    fetchNotifs(); // Fetch immediately on mount
+    const interval = setInterval(fetchNotifs, 10000); // Poll every 10 seconds
+
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, [isLoggedIn, userRole]);
 
   const handleLogout = () => {
     authService.logout();
@@ -153,9 +205,14 @@ const Navbar = () => {
                   </Link>
                 </li>
                 {userRole === "Buyer" && (
-                  <li>
-                    <Link to="/watchlist">My Watchlist</Link>
-                  </li>
+                  <>
+                    <li>
+                      <Link to="/watchlist">My Watchlist</Link>
+                    </li>
+                    <li>
+                      <Link to="/notifications">Notifications</Link>
+                    </li>
+                  </>
                 )}
                 <li>
                   <a onClick={handleLogout}>Logout</a>
@@ -201,6 +258,20 @@ const Navbar = () => {
           </label>
         </div>
       </div>
+
+      {/* Real-time Notification Toast */}
+      {toastNotification && (
+        <div className="toast toast-top toast-center z-[100] mt-16">
+          <div className="alert alert-info shadow-lg flex items-start gap-4 bg-primary text-primary-content">
+            <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current flex-shrink-0 h-6 w-6 mt-1" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            <div>
+              <h3 className="font-bold">{toastNotification.title || toastNotification.header || "New Notification!"}</h3>
+              <div className="text-sm">{toastNotification.message || toastNotification.content || toastNotification.body || "You have a new update."}</div>
+            </div>
+            <button className="btn btn-sm btn-ghost ml-2" onClick={() => setToastNotification(null)}>✕</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
