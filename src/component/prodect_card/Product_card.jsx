@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { formatImage } from "../../utils/imageUtils";
 
-const ProductCard = ({ id, title, image }) => {
+const ProductCard = ({ id, title, image, artistName }) => {
   return (
     <Link to={`/product/${id}`} className="hover:scale-105 transition-transform">
       <div className="card bg-base-100 w-96 shadow-sm cursor-pointer">
@@ -12,6 +12,7 @@ const ProductCard = ({ id, title, image }) => {
 
         <div className="card-body">
           <h2 className="card-title">{title}</h2>
+          {artistName && <p className="text-sm font-semibold text-gray-500 dark:text-gray-400 -mt-1 mb-2">By {artistName}</p>}
           <p>Click to view details and place a bid.</p>
 
           <div className="card-actions justify-end">

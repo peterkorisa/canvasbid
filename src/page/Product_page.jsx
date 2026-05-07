@@ -4,7 +4,7 @@ import Navbar from '../component/Navbar';
 import { LoadingSpinner } from '../component/LoadingSpinner';
 import { artworkService } from '../services/artworkService';
 import { bidService } from '../services/bidService';
-import { getToken, getUserRole } from '../services/api';
+import { getToken, getUserRole, getUser } from '../services/api';
 import { formatImage } from '../utils/imageUtils';
 
 // BidHistoryTable Component
@@ -66,6 +66,7 @@ const Productpage = () => {
   const [watchlistLoading, setWatchlistLoading] = useState(false);
   const [timeLeft, setTimeLeft] = useState('');
   const [isAuctionClosed, setIsAuctionClosed] = useState(false);
+  const [isAuctionStarted, setIsAuctionStarted] = useState(true);
   const [closingAuction, setClosingAuction] = useState(false);
 
   useEffect(() => {
@@ -133,8 +134,29 @@ const Productpage = () => {
         return true;
       }
 
-      const endTimeMs = end.getTime();
       const now = new Date().getTime();
+      
+      let startStr = product.startTime || product.StartTime;
+      if (startStr && !startStr.endsWith('Z') && !startStr.includes('+')) {
+        startStr += 'Z';
+      }
+      const start = new Date(startStr);
+      const startTimeMs = start.getTime();
+
+      if (start.getFullYear() > 1 && startTimeMs > now) {
+        if (isAuctionStarted) setIsAuctionStarted(false);
+        const startDiff = startTimeMs - now;
+        const days = Math.floor(startDiff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((startDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((startDiff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((startDiff % (1000 * 60)) / 1000);
+        setTimeLeft(`Starts in: ${days > 0 ? days + 'd ' : ''}${hours}h ${minutes}m ${seconds}s`);
+        return false;
+      } else {
+        if (!isAuctionStarted) setIsAuctionStarted(true);
+      }
+
+      const endTimeMs = end.getTime();
       const difference = endTimeMs - now;
 
       if (difference <= 0) {
@@ -144,8 +166,8 @@ const Productpage = () => {
            setClosingAuction(true);
            
            const role = getUserRole();
-           // Only call backend if user is Admin or Artist to prevent 403 Forbidden errors
-           if (role === 'Admin' || role === 'Artist') {
+           // Only call backend if user is Admin to prevent 403 Forbidden errors
+           if (role === 'Admin') {
              bidService.closeAuction(id).then(() => {
                 console.log('Auction closed successfully');
              }).catch((err) => {
@@ -154,15 +176,18 @@ const Productpage = () => {
                 }
              });
            } else {
-             // For buyers, we can't close the auction via API, so we check locally if they won
+             // For artists and buyers, we can't close the auction via API, so we check locally if they won
              const currentUser = getUser();
              if (currentUser && currentUser.email && bidHistory && bidHistory.length > 0) {
                 const myName = currentUser.email.split("@")[0];
                 // Check both userName and bidderName since API uses bidderName
-                const topBid = bidHistory[bidHistory.length - 1] || bidHistory[0];
+                const topBid = bidHistory[0]; // Backend sorts by amount descending, so index 0 is the highest
                 const topBidder = topBid?.bidderName || topBid?.userName;
                 
-                if (topBidder === myName || bidHistory.some(b => b.bidderName === myName || b.userName === myName)) {
+                // topBidder might be the full email from the backend, so we need to compare both email and username
+                const topBidderPrefix = topBidder?.includes('@') ? topBidder.split('@')[0] : topBidder;
+                
+                if (topBidder === currentUser.email || topBidderPrefix === myName || topBidder === currentUser.username) {
                    // Create a local notification for the buyer
                    const localNotifs = JSON.parse(localStorage.getItem('localNotifications') || '[]');
                    if (!localNotifs.some(n => n.artworkId === id)) {
@@ -171,6 +196,7 @@ const Productpage = () => {
                          artworkId: id,
                          title: 'Bid Won! 🎉',
                          message: `Congratulations! You won the auction for "${product.title}"!`,
+                         image: product.image,
                          createdAt: new Date().toISOString()
                       });
                       localStorage.setItem('localNotifications', JSON.stringify(localNotifs));
@@ -200,7 +226,7 @@ const Productpage = () => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [product, isAuctionClosed, closingAuction, id, bidHistory]);
+  }, [product, isAuctionClosed, isAuctionStarted, closingAuction, id, bidHistory]);
 
   const handlePlaceBid = async () => {
     if (!isLoggedIn) {
@@ -319,6 +345,9 @@ const Productpage = () => {
           {/* Details */}
           <div className="w-full md:w-1/2 px-4 flex flex-col justify-start">
             <h2 className="text-4xl font-bold mb-2 dark:text-white">{product.title}</h2>
+            <p className="text-lg font-medium text-gray-500 dark:text-gray-400 mb-2">
+              By {product.ownerName || product.user?.userName || product.user?.email || (typeof product.userId === 'string' && !product.userId.includes('-') ? product.userId : "Unknown Artist")}
+            </p>
             <p className="text-gray-600 dark:text-gray-400 mb-4">Category: {product.category}</p>
             
             <div className="mb-4">
@@ -354,17 +383,17 @@ const Productpage = () => {
                 value={bidAmount}
                 onChange={(e) => setBidAmount(e.target.value)}
                 placeholder={`Enter bid amount (minimum: $${(product.intialPrice + 10).toFixed(2)})`}
-                disabled={!isLoggedIn || bidLoading || isAuctionClosed}
+                disabled={!isLoggedIn || bidLoading || isAuctionClosed || !isAuctionStarted}
                 className="w-full p-3 rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-lg disabled:opacity-50"
               />
             </div>
 
             <button
               onClick={handlePlaceBid}
-              disabled={!isLoggedIn || bidLoading || isAuctionClosed}
+              disabled={!isLoggedIn || bidLoading || isAuctionClosed || !isAuctionStarted}
               className="!bg-indigo-600 text-white px-8 py-3 rounded-md text-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 w-full md:w-3/4 mt-auto disabled:bg-gray-400 disabled:cursor-not-allowed transition"
             >
-              {isAuctionClosed ? 'Auction Closed' : bidLoading ? 'Placing Bid...' : 'Place Bid'}
+              {isAuctionClosed ? 'Auction Closed' : !isAuctionStarted ? 'Not Started Yet' : bidLoading ? 'Placing Bid...' : 'Place Bid'}
             </button>
 
             <div className="flex gap-4 mt-4 w-full md:w-3/4">

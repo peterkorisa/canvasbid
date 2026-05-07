@@ -1,4 +1,4 @@
-using canvasBid.Data;
+﻿using canvasBid.Data;
 using canvasBid.Dtos;
 using canvasBid.Hubs;
 using canvasBid.Models;
@@ -165,17 +165,6 @@ namespace canvasBid.Controller
             return Ok(artworks);
         }
         //************************************************************************************************************************************************//
-        // Get single artwork by ID
-        [HttpGet("{id}")]
-        public IActionResult GetById(int id)
-        {
-            var artwork = _context.Artwork.Find(id);
-            if (artwork == null || artwork.status != ArtworkStatus.Approved)
-                return NotFound();
-            
-            return Ok(artwork);
-        }
-        //************************************************************************************************************************************************//
         [HttpGet("filter")]
         public IActionResult Filter(string? artist, string? category, int? tagId)
         {
@@ -220,25 +209,6 @@ namespace canvasBid.Controller
             _context.SaveChanges();
 
             return Ok("Added to watchlist");
-        }
-        //***********************************************************************************************************//
-
-        [Authorize(Roles = "Buyer")]
-        [HttpDelete("watchlist/{artworkId}")]
-        public IActionResult RemoveFromWatchlist(int artworkId)
-        {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            var watch = _context.Watchlists
-                .FirstOrDefault(x => x.UserId == userId && x.ArtworkId == artworkId);
-
-            if (watch == null)
-                return NotFound("Not in watchlist");
-
-            _context.Watchlists.Remove(watch);
-            _context.SaveChanges();
-
-            return Ok("Removed from watchlist");
         }
         //***********************************************************************************************************//
 

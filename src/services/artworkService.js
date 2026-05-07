@@ -66,7 +66,7 @@ export const artworkService = {
   },
 
   // Update artwork
-  update: async (id, title, description, initialPrice, buyNowPrice, category, image) => {
+  update: async (id, title, description, initialPrice, buyNowPrice, category, image, startTime, endTime) => {
     return await apiCall(
       `/Artwork/${id}`,
       "PUT",
@@ -78,6 +78,8 @@ export const artworkService = {
         buyNowPrice,
         category,
         image,
+        startTime: startTime ? new Date(startTime).toISOString() : null,
+        endTime: endTime ? new Date(endTime).toISOString() : null
       },
       true
     );

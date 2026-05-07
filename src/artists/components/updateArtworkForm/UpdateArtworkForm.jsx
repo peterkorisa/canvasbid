@@ -5,6 +5,43 @@ const UpdateArtworkForm = ({ tags, artwork, setArtworks, modalRef }) => {
   const [loading, setLoading] = useState(false);
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    const title = artwork.title;
+    const description = artwork.discreption || artwork.description;
+    const initialPrice = artwork.initialPrice || artwork.intialPrice;
+    const category = artwork.category;
+    const startTimeStr = artwork.startTime || artwork.auctionStartTime;
+    const endTimeStr = artwork.endTime || artwork.auctionEndTime;
+    const hasImages = (artwork.images && artwork.images.length > 0) || artwork.image;
+
+    // Check if all fields are filled
+    if (!title || !description || !initialPrice || !category || category === "Pick a color" || !startTimeStr || !endTimeStr) {
+      alert("Please fill in all required fields.");
+      return;
+    }
+
+    // Check if images are uploaded or exist
+    if (!hasImages) {
+      alert("Please upload at least one image.");
+      return;
+    }
+
+    // Validate times
+    const start = new Date(startTimeStr);
+    const end = new Date(endTimeStr);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (start < today) {
+      alert("Auction start time cannot be before today.");
+      return;
+    }
+
+    if (start >= end) {
+      alert("Auction start time must be before the end time.");
+      return;
+    }
+
     setLoading(true);
     try {
       const targetId = artwork.id || artwork.artworkId;
@@ -27,7 +64,9 @@ const UpdateArtworkForm = ({ tags, artwork, setArtworks, modalRef }) => {
           parseFloat(artwork.initialPrice || artwork.intialPrice) || 0,
           (parseFloat(artwork.initialPrice || artwork.intialPrice) || 0) * 1.5,
           artwork.category,
-          imageBase64
+          imageBase64,
+          artwork.startTime || artwork.auctionStartTime,
+          artwork.endTime || artwork.auctionEndTime
         );
       }
 
@@ -83,6 +122,25 @@ const UpdateArtworkForm = ({ tags, artwork, setArtworks, modalRef }) => {
       ),
     );
   };
+
+  const formatDateForInput = (dateString) => {
+    if (!dateString) return "";
+    let str = typeof dateString === 'string' ? dateString : dateString.toString();
+    if (str.includes('0001-01-01')) return ""; // Handle C# min value
+    
+    if (str.endsWith('Z')) {
+       // Convert UTC ISO string to local time format YYYY-MM-DDThh:mm
+       const d = new Date(str);
+       if (isNaN(d.getTime())) return "";
+       const pad = (n) => String(n).padStart(2, '0');
+       return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    }
+    
+    // If no Z, assume it's already local, just slice up to minutes
+    if (str.length >= 16) return str.substring(0, 16);
+    return str;
+  };
+
   return (
     <form
       onSubmit={handleSubmit}
@@ -167,7 +225,7 @@ const UpdateArtworkForm = ({ tags, artwork, setArtworks, modalRef }) => {
               name="startTime"
               type="datetime-local"
               className="input min-w-0 w-full text-black input-secondary bg-secondary"
-              value={artwork.startTime || artwork.auctionStartTime || ""}
+              value={formatDateForInput(artwork.startTime || artwork.auctionStartTime || "")}
               onChange={(e) => handleChange(e)}
             />
           </fieldset>
@@ -181,7 +239,7 @@ const UpdateArtworkForm = ({ tags, artwork, setArtworks, modalRef }) => {
               name="endTime"
               type="datetime-local"
               className="input min-w-0 w-full text-black placeholder: input-secondary bg-secondary"
-              value={artwork.endTime || artwork.auctionEndTime || ""}
+              value={formatDateForInput(artwork.endTime || artwork.auctionEndTime || "")}
               onChange={(e) => handleChange(e, artwork.id)}
             />
           </fieldset>

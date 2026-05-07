@@ -86,6 +86,7 @@ const ArtworksHome = () => {
               id={artwork.artworkId || artwork.id}
               title={artwork.title}
               image={artwork.image || "https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"}
+              artistName={artwork.ownerName || artwork.user?.userName || artwork.user?.email || (typeof artwork.userId === 'string' && !artwork.userId.includes('-') ? artwork.userId : "Unknown Artist")}
             />
           ))}
         </div>

@@ -9,6 +9,7 @@ const Navbar = () => {
   const [userRole, setUserRole] = useState(null);
   const [userName, setUserName] = useState("");
   const [toastNotification, setToastNotification] = useState(null);
+  const [unreadCount, setUnreadCount] = useState(0);
   const prevCountRef = useRef(-1);
   const navigate = useNavigate();
 
@@ -47,18 +48,38 @@ const Navbar = () => {
           dataToSet = [{ message: response }];
         }
 
+        const localNotifs = JSON.parse(localStorage.getItem('localNotifications') || '[]');
+        dataToSet = [...localNotifs, ...dataToSet];
+
+        const seen = new Set();
+        dataToSet = dataToSet.filter(n => {
+           const key = (n.message || n.content || n.body || '') + (n.title || n.header || '');
+           if (seen.has(key)) return false;
+           seen.add(key);
+           return true;
+        });
+
         if (isMounted) {
+           const totalCount = dataToSet.length;
            const prevCount = prevCountRef.current;
-           if (dataToSet.length > prevCount && prevCount !== -1) {
+           
+           if (window.location.pathname === '/notifications') {
+              localStorage.setItem('readNotificationsCount', totalCount.toString());
+              setUnreadCount(0);
+           } else {
+              const readCount = parseInt(localStorage.getItem('readNotificationsCount') || '0', 10);
+              setUnreadCount(Math.max(0, totalCount - readCount));
+           }
+
+           if (totalCount > prevCount && prevCount !== -1) {
               // New notification!
-              const newNotif = dataToSet[dataToSet.length - 1]; 
+              const newNotif = dataToSet[0]; // Assuming first is newest, or we just take any new one
               setToastNotification(newNotif);
-              // Hide toast after 5 seconds
               setTimeout(() => {
                 if (isMounted) setToastNotification(null);
               }, 5000);
            }
-           prevCountRef.current = dataToSet.length;
+           prevCountRef.current = totalCount;
         }
       } catch (err) {
         // Silently ignore polling errors
@@ -84,7 +105,7 @@ const Navbar = () => {
 
   const getDashboardLink = () => {
     if (userRole === "Admin") return "/admin";
-    if (userRole === "Artist") return "/artists/artworks";
+    if (userRole === "Artist") return "/artists/";
     return "/artworks";
   };
 
@@ -191,7 +212,8 @@ const Navbar = () => {
         {/* Right Buttons */}
         <div className="navbar-end gap-2">
           {isLoggedIn ? (
-            <div className="dropdown dropdown-end">
+            <>
+              <div className="dropdown dropdown-end">
               <button tabIndex={0} className="btn btn-ghost">
                 <span className="text-sm">{userName}</span>
               </button>
@@ -219,6 +241,17 @@ const Navbar = () => {
                 </li>
               </ul>
             </div>
+            {userRole === "Buyer" && (
+              <Link to="/notifications" className="btn btn-ghost btn-circle relative ml-2">
+                <div className="indicator">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+                  {unreadCount > 0 && (
+                    <span className="badge badge-sm badge-secondary indicator-item font-bold">{unreadCount}</span>
+                  )}
+                </div>
+              </Link>
+            )}
+            </>
           ) : (
             <>
               <Link to="/login" className="btn btn-outline">
@@ -261,8 +294,8 @@ const Navbar = () => {
 
       {/* Real-time Notification Toast */}
       {toastNotification && (
-        <div className="toast toast-top toast-center z-[100] mt-16">
-          <div className="alert alert-info shadow-lg flex items-start gap-4 bg-primary text-primary-content">
+        <div className="toast toast-top toast-center z-[100] mt-16 cursor-pointer" onClick={() => { navigate('/notifications'); setToastNotification(null); }}>
+          <div className="alert alert-info shadow-lg flex items-start gap-4 bg-primary text-primary-content hover:bg-primary-focus transition-colors">
             <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current flex-shrink-0 h-6 w-6 mt-1" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
             <div>
               <h3 className="font-bold">{toastNotification.title || toastNotification.header || "New Notification!"}</h3>

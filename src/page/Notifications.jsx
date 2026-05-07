@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { notificationService } from "../services/notificationService";
+import { formatImage } from "../utils/imageUtils";
 import Navbar from "../component/Navbar";
 import Footer from "../component/Footer";
 
@@ -28,6 +29,27 @@ const Notifications = () => {
           // If the backend just returns a plain string message
           dataToSet = [{ message: response }];
         }
+
+        // Add local notifications (like local "Bid Won" alerts)
+        const localNotifs = JSON.parse(localStorage.getItem('localNotifications') || '[]');
+        dataToSet = [...localNotifs, ...dataToSet];
+
+        // Deduplicate notifications (in case backend and local show the same alert)
+        const seen = new Set();
+        dataToSet = dataToSet.filter(n => {
+           // Create a unique key based on message or title to remove duplicates
+           const key = (n.message || n.content || n.body || '') + (n.title || n.header || '');
+           if (seen.has(key)) return false;
+           seen.add(key);
+           return true;
+        });
+
+        // Sort all notifications by date descending
+        dataToSet.sort((a, b) => {
+          const dateA = new Date(a.createdAt || a.date || a.timestamp || 0);
+          const dateB = new Date(b.createdAt || b.date || b.timestamp || 0);
+          return dateB - dateA;
+        });
 
         setNotifications(dataToSet);
       } catch (err) {
@@ -108,22 +130,17 @@ const Notifications = () => {
                 className="card bg-base-100 shadow-xl border border-base-300 hover:shadow-2xl transition-shadow duration-300"
               >
                 <div className="card-body p-6 flex flex-row items-start gap-4">
-                  <div className="avatar placeholder">
-                    <div className="bg-primary text-primary-content rounded-full w-12">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-6 w-6"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                        />
-                      </svg>
+                  <div className="avatar">
+                    <div className="w-16 h-16 rounded-xl shadow-md border border-gray-100 dark:border-gray-700 overflow-hidden">
+                      {notification.image ? (
+                        <img src={formatImage(notification.image, "https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp")} alt="Artwork" className="object-cover w-full h-full hover:scale-110 transition-transform duration-300" />
+                      ) : (
+                        <div className="bg-gradient-to-br from-[#5937E0] to-[#FF9E0C] w-full h-full flex items-center justify-center text-white">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 drop-shadow-md" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                          </svg>
+                        </div>
+                      )}
                     </div>
                   </div>
                   <div className="flex-grow">
