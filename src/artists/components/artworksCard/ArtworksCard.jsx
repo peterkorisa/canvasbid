@@ -12,7 +12,7 @@ const ArtworksCard = ({ artwork, tags, setArtworks, artworks }) => {
           src={
             artwork.images && artwork.images[0] instanceof File
               ? URL.createObjectURL(artwork.images[0])
-              : formatImage((artwork.images && artwork.images[0]) || artwork.image, 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=150')
+              : formatImage((artwork.images && artwork.images[0]) || artwork.image, 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=150', artwork.artworkId || artwork.id)
           }
           alt={artwork.title || "Artwork"}
         />

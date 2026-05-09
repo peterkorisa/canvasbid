@@ -335,7 +335,7 @@ const Productpage = () => {
           {/* Images */}
           <div className="w-full md:w-1/2 px-4 mb-8 md:mb-0 flex flex-col">
             <img
-              src={formatImage(product.image, 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080')}
+              src={formatImage(product.image, 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080', id)}
               alt={product.title}
               className="w-full h-full object-contain rounded-lg shadow-md mb-4 flex-1 bg-white"
               id="mainImage"
@@ -346,7 +346,7 @@ const Productpage = () => {
           <div className="w-full md:w-1/2 px-4 flex flex-col justify-start">
             <h2 className="text-4xl font-bold mb-2 dark:text-white">{product.title}</h2>
             <p className="text-lg font-medium text-gray-500 dark:text-gray-400 mb-2">
-              By {product.ownerName || product.user?.userName || product.user?.email || (typeof product.userId === 'string' && !product.userId.includes('-') ? product.userId : "Unknown Artist")}
+              By {product.artistName || product.ownerName || product.user?.userName || product.user?.name || "Unknown Artist"}
             </p>
             <p className="text-gray-600 dark:text-gray-400 mb-4">Category: {product.category}</p>
             

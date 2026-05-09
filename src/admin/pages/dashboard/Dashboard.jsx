@@ -35,9 +35,9 @@ const Dashboard = () => {
               <path d="M14 10l2 2l-2 2"></path>
             </svg>
           </label>
-          <div className="px-4 text-3xl !font-black !text-[#5937E0]">
+          <Link to="/" className="px-4 text-3xl !font-black !text-[#5937E0]">
             CanvasBid
-          </div>
+          </Link>
         </nav>
         {/* Page content here */}
         <div className="p-4 !text-white bg-[#1a1a40] grow ">

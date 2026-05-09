@@ -82,12 +82,12 @@ export const authService = {
 
   // Approve artist
   approveArtist: async (id) => {
-    return await apiCall(`/Auth/approve-artist/${id}`, "POST", {}, true);
+    return await apiCall(`/Auth/accept/${id}`, "POST", {}, true);
   },
 
   // Reject artist
   rejectArtist: async (id) => {
-    return await apiCall(`/Auth/reject-artist/${id}`, "POST", {}, true);
+    return await apiCall(`/Auth/reject/${id}`, "POST", {}, true);
   },
 
   // Logout

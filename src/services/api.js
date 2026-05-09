@@ -12,7 +12,7 @@ import {
 
 // Change this to local backend so the new endpoints work!
 // const BASE_URL = "https://localhost:7028/api";
-const BASE_URL = "https://app-260421214011.azurewebsites.net/api";
+export const BASE_URL = "https://app-260509210637.azurewebsites.net/api";
 
 // Flag to prevent multiple simultaneous refresh attempts
 let isRefreshing = false;

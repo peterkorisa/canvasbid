@@ -96,7 +96,7 @@ const Users = () => {
                       </span>
                     </td>
 
-                    {user.status && user.status.toLowerCase() === "pending" && (
+                    {(user.status === "Pending" || user.status === 0 || (typeof user.status === 'string' && user.status.toLowerCase() === "pending")) ? (
                       <>
                         <th className="!p-0 w-[10%]">
                           <button
@@ -119,7 +119,7 @@ const Users = () => {
                           </button>
                         </th>
                       </>
-                    )}
+                    ) : null}
                   </tr>
                 );
               })}

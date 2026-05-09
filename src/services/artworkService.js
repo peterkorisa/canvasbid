@@ -47,7 +47,9 @@ export const artworkService = {
 
   // Get all artworks
   getAll: async () => {
-    return await apiCall("/Artwork", "GET", null, true);
+    const artworks = await apiCall("/Artwork/all", "GET", null, true);
+    console.log("All Artworks:", artworks);
+    return artworks;
   },
 
   // Get pending artworks (admin)
@@ -57,12 +59,8 @@ export const artworkService = {
 
   // Get single artwork by ID
   getById: async (id) => {
-    // The backend does not support GET /Artwork/:id (returns 405 Method Not Allowed).
-    // So we fetch all artworks and filter by ID to avoid console errors.
-    const allArtworks = await apiCall("/Artwork", "GET", null, true);
-    const artwork = allArtworks.find(a => String(a.artworkId) === String(id) || String(a.id) === String(id));
-    if (!artwork) throw new Error("Artwork not found");
-    return artwork;
+    // Call the specific artwork ID endpoint which is AllowAnonymous
+    return await apiCall(`/Artwork/${id}`, "GET", null, true);
   },
 
   // Update artwork
@@ -109,7 +107,9 @@ export const artworkService = {
 
   // Get current artist's artworks
   getMyArtworks: async () => {
-    return await apiCall("/Artwork/myartworks", "GET", null, true);
+    const artworks = await apiCall("/Artwork/my-artworks", "GET", null, true);
+    console.log("User Artworks:", artworks);
+    return artworks;
   },
 
   // Add artwork to watchlist
