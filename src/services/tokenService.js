@@ -3,9 +3,6 @@ const ACCESS_TOKEN_KEY = "access_token";
 const REFRESH_TOKEN_KEY = "refresh_token";
 const USER_KEY = "user";
 
-/**
- * Decode JWT token payload
- */
 export const decodeToken = (token) => {
   try {
     if (!token) {
@@ -33,23 +30,14 @@ export const decodeToken = (token) => {
   }
 };
 
-/**
- * Get the current access token
- */
 export const getAccessToken = () => {
   return localStorage.getItem(ACCESS_TOKEN_KEY);
 };
 
-/**
- * Get the current refresh token
- */
 export const getRefreshToken = () => {
   return localStorage.getItem(REFRESH_TOKEN_KEY);
 };
 
-/**
- * Store both access and refresh tokens
- */
 export const setTokens = (accessToken, refreshToken) => {
   console.log("🔐 setTokens called with token:", accessToken?.substring(0, 50) + "...");
   
@@ -84,54 +72,37 @@ export const setTokens = (accessToken, refreshToken) => {
   }
 };
 
-/**
- * Clear all tokens
- */
 export const clearTokens = () => {
   localStorage.removeItem(ACCESS_TOKEN_KEY);
   localStorage.removeItem(REFRESH_TOKEN_KEY);
   localStorage.removeItem(USER_KEY);
+  localStorage.removeItem('localNotifications');
+  localStorage.removeItem('readNotificationsCount');
 };
 
-/**
- * Get token expiry time from JWT payload
- */
 export const getTokenExpiryTime = (token) => {
   if (!token) return null;
   const decoded = decodeToken(token);
   if (!decoded || !decoded.exp) return null;
-  return new Date(decoded.exp * 1000); // Convert from seconds to milliseconds
+  return new Date(decoded.exp * 1000);
 };
 
-/**
- * Check if token is expired
- */
 export const isTokenExpired = (token) => {
   if (!token) return true;
   const expiryTime = getTokenExpiryTime(token);
   if (!expiryTime) return true;
-  // Consider token expired if less than 1 minute remaining
   return new Date() >= new Date(expiryTime.getTime() - 60000);
 };
 
-/**
- * Get user info from localStorage
- */
 export const getUser = () => {
   const user = localStorage.getItem(USER_KEY);
   return user ? JSON.parse(user) : null;
 };
 
-/**
- * Store user info
- */
 export const setUser = (user) => {
   localStorage.setItem(USER_KEY, JSON.stringify(user));
 };
 
-/**
- * Extract user role from access token
- */
 export const getUserRoleFromToken = () => {
   const token = getAccessToken();
   if (!token) {
@@ -145,13 +116,11 @@ export const getUserRoleFromToken = () => {
     return null;
   }
 
-  // JWT standard role claim
   if (decoded.role) {
     console.log("✅ Role found in 'role' claim:", decoded.role);
     return Array.isArray(decoded.role) ? decoded.role[0] : decoded.role;
   }
 
-  // Microsoft Identity claims
   const msRoleClaim = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role";
   if (decoded[msRoleClaim]) {
     console.log("✅ Role found in Microsoft claim:", decoded[msRoleClaim]);
@@ -164,9 +133,6 @@ export const getUserRoleFromToken = () => {
   return null;
 };
 
-/**
- * Extract user ID from access token
- */
 export const getUserIdFromToken = () => {
   const token = getAccessToken();
   if (!token) return null;
@@ -174,7 +140,6 @@ export const getUserIdFromToken = () => {
   const decoded = decodeToken(token);
   if (!decoded) return null;
 
-  // Microsoft Identity claim for User ID
   const nameIdentifierClaim = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier";
   if (decoded[nameIdentifierClaim]) {
     return Array.isArray(decoded[nameIdentifierClaim])
@@ -187,9 +152,6 @@ export const getUserIdFromToken = () => {
   return null;
 };
 
-/**
- * Get remaining time before token expires (in milliseconds)
- */
 export const getTimeUntilExpiry = (token) => {
   const expiryTime = getTokenExpiryTime(token);
   if (!expiryTime) return 0;

@@ -10,15 +10,11 @@ import {
   getUserRoleFromToken,
 } from "./tokenService";
 
-// Change this to local backend so the new endpoints work!
-// const BASE_URL = "https://localhost:7028/api";
 export const BASE_URL = "https://app-260509210637.azurewebsites.net/api";
 
-// Flag to prevent multiple simultaneous refresh attempts
 let isRefreshing = false;
 let refreshPromise = null;
 
-// Token management (for backward compatibility and delegation to tokenService)
 export const getToken = () => getAccessToken();
 export const setToken = (token) => setTokens(token, null);
 export const removeToken = () => clearTokens();
@@ -27,18 +23,19 @@ export const getUser = () => getStoredUser();
 export const setUser = (user) => setStoredUser(user);
 export const removeUser = () => clearTokens();
 
-// Base API call function
 export const apiCall = async (
   endpoint,
   method = "GET",
   body = null,
   requiresAuth = true
 ) => {
-  const headers = {
-    "Content-Type": "application/json",
-  };
+  const headers = {};
+  const isFormData = body instanceof FormData;
 
-  // Add JWT token if required and available
+  if (!isFormData) {
+    headers["Content-Type"] = "application/json";
+  }
+
   if (requiresAuth) {
     const token = getToken();
     if (token) {
@@ -53,7 +50,7 @@ export const apiCall = async (
   };
 
   if (body && (method === "POST" || method === "PUT")) {
-    options.body = JSON.stringify(body);
+    options.body = isFormData ? body : JSON.stringify(body);
   }
 
   try {
@@ -62,15 +59,13 @@ export const apiCall = async (
 
     console.log(`API Response Status: ${response.status}`);
 
-    // Handle unauthorized (token expired or invalid)
     if (response.status === 401) {
       removeToken();
       removeUser();
-      window.location.href = "/login"; // Redirect to login
+      window.location.href = "/login";
       return null;
     }
 
-    // Handle server errors
     if (!response.ok) {
       if (response.status === 403) {
         throw new Error("Access Denied: Your account may be pending admin approval, or you do not have permission to view this.");
@@ -86,7 +81,6 @@ export const apiCall = async (
           errorMessage = errorData.message || errorData.error || errorData.title || errorMessage;
         }
       } catch (e) {
-        // Ignored if not JSON
       }
       throw new Error(errorMessage);
     }
@@ -97,7 +91,7 @@ export const apiCall = async (
     try {
       return JSON.parse(textData);
     } catch (e) {
-      return textData; // Return as plain text if not JSON
+      return textData;
     }
   } catch (error) {
     console.error("API Error:", error.message);
@@ -105,7 +99,6 @@ export const apiCall = async (
   }
 };
 
-// Helper to decode JWT and extract role
 export const decodeToken = (token) => {
   try {
     const base64Url = token.split(".")[1];
@@ -123,7 +116,6 @@ export const decodeToken = (token) => {
   }
 };
 
-// Helper to extract user role from token
 export const getUserRole = () => {
   const token = getToken();
   if (!token) return null;
@@ -131,10 +123,8 @@ export const getUserRole = () => {
   const decoded = decodeToken(token);
   if (!decoded) return null;
 
-  // JWT stores roles in "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
   const roleKey = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role";
   const roles = decoded[roleKey];
 
-  // Could be string or array
   return Array.isArray(roles) ? roles[0] : roles;
 };

@@ -1,41 +1,43 @@
 import { apiCall, getUser } from "./api";
 
 export const artworkService = {
-  create: async (title, description, initialPrice, buyNowPrice, category, image, startTime, endTime) => {
-    // If image is a base64 string, we need to handle it or pass it correctly. 
-    // Wait, the backend expects a byte[]? Image. 
-    // A base64 string can be accepted by ASP.NET Core as byte[] if it's correctly formatted (just the base64 part, without the data:image/png;base64, prefix).
-    let base64Image = null;
-    if (image && image.includes(',')) {
-      base64Image = image.split(',')[1];
-    } else if (image) {
-      base64Image = image;
+  create: async (title, description, initialPrice, buyNowPrice, category, imageFile, tags = [], artistId = null, startTime, endTime) => {
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("discreption", description);
+    formData.append("buyNowPrice", buyNowPrice);
+    formData.append("intialPrice", initialPrice);
+    formData.append("category", category);
+    
+    if (imageFile instanceof File) {
+      formData.append("Image", imageFile);
+    } else if (imageFile) {
+      formData.append("image", imageFile);
     }
+
+    if (tags && Array.isArray(tags)) {
+      tags.forEach(tag => formData.append("Tags", tag));
+    }
+
+    if (artistId) {
+      formData.append("artistId", artistId);
+    }
+
+    if (startTime) formData.append("startTime", new Date(startTime).toISOString());
+    if (endTime) formData.append("endTime", new Date(endTime).toISOString());
 
     const newArtwork = await apiCall(
       "/Artwork",
       "POST",
-      {
-        title,
-        description,
-        discreption: description,
-        intialPrice: initialPrice,
-        buyNowPrice,
-        category,
-        image: base64Image,
-        startTime: startTime ? new Date(startTime).toISOString() : null,
-        endTime: endTime ? new Date(endTime).toISOString() : null
-      },
+      formData,
       true
     );
 
-    // Save to local storage since backend doesn't return pending artworks to artists
     try {
       const pendingArtworks = JSON.parse(localStorage.getItem('artistPendingArtworks') || '[]');
-      // Assuming backend returns status as an integer (e.g. 0 for Pending), we explicitly set it to 'Pending' for UI
       const user = getUser();
       const userName = user?.name || user?.username || "You";
-      const artworkToSave = { ...newArtwork, ownerName: newArtwork.ownerName || userName, status: 'Pending', tags: [], images: [image] };
+      const artworkToSave = { ...newArtwork, ownerName: newArtwork.ownerName || userName, status: 'Pending', tags: tags, images: [] };
       pendingArtworks.push(artworkToSave);
       localStorage.setItem('artistPendingArtworks', JSON.stringify(pendingArtworks));
     } catch (e) {
@@ -45,97 +47,96 @@ export const artworkService = {
     return newArtwork;
   },
 
-  // Get all artworks
   getAll: async () => {
     const artworks = await apiCall("/Artwork/all", "GET", null, true);
     console.log("All Artworks:", artworks);
     return artworks;
   },
 
-  // Get pending artworks (admin)
   getPending: async () => {
     return await apiCall("/Artwork/pending", "GET", null, true);
   },
 
-  // Get single artwork by ID
   getById: async (id) => {
-    // Call the specific artwork ID endpoint which is AllowAnonymous
     return await apiCall(`/Artwork/${id}`, "GET", null, true);
   },
 
-  // Update artwork
-  update: async (id, title, description, initialPrice, buyNowPrice, category, image, startTime, endTime) => {
+  update: async (id, title, description, initialPrice, buyNowPrice, category, imageFile, tags = [], artistId = null, startTime, endTime) => {
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("discreption", description);
+    formData.append("buyNowPrice", buyNowPrice);
+    formData.append("intialPrice", initialPrice);
+    formData.append("category", category);
+    
+    if (imageFile instanceof File) {
+      formData.append("Image", imageFile);
+    } else if (imageFile) {
+      formData.append("image", imageFile);
+    }
+
+    if (tags && Array.isArray(tags)) {
+      tags.forEach(tag => formData.append("Tags", tag));
+    }
+
+    if (artistId) {
+      formData.append("artistId", artistId);
+    }
+
+    if (startTime) formData.append("startTime", new Date(startTime).toISOString());
+    if (endTime) formData.append("endTime", new Date(endTime).toISOString());
+
     return await apiCall(
       `/Artwork/${id}`,
       "PUT",
-      {
-        title,
-        description,
-        discreption: description,
-        intialPrice: initialPrice,
-        buyNowPrice,
-        category,
-        image,
-        startTime: startTime ? new Date(startTime).toISOString() : null,
-        endTime: endTime ? new Date(endTime).toISOString() : null
-      },
+      formData,
       true
     );
   },
 
-  // Delete artwork
   delete: async (id) => {
     return await apiCall(`/Artwork/${id}`, "DELETE", null, true);
   },
 
-  // Approve artwork (admin)
   approve: async (id) => {
     return await apiCall(`/Artwork/approve/${id}`, "POST", {}, true);
   },
 
-  // Reject artwork (admin)
   reject: async (id) => {
     return await apiCall(`/Artwork/reject/${id}`, "POST", {}, true);
   },
 
-  // Filter artworks
   filter: async (filters = {}) => {
     const queryParams = new URLSearchParams(filters).toString();
     const endpoint = queryParams ? `/Artwork/filter?${queryParams}` : "/Artwork/filter";
     return await apiCall(endpoint, "GET", null, true);
   },
 
-  // Get current artist's artworks
   getMyArtworks: async () => {
     const artworks = await apiCall("/Artwork/my-artworks", "GET", null, true);
     console.log("User Artworks:", artworks);
     return artworks;
   },
 
-  // Add artwork to watchlist
   addToWatchlist: async (artworkId) => {
     return await apiCall(`/Artwork/watchlist/${artworkId}`, "POST", {}, true);
   },
 
-  // Get user's watchlist
   getWatchlist: async () => {
     return await apiCall("/Artwork/watchlist", "GET", null, true);
   },
 
-  // Remove artwork from watchlist
   removeFromWatchlist: async (artworkId) => {
     try {
       return await apiCall(`/Artwork/watchlist/${artworkId}`, "DELETE", null, true);
     } catch (e) {
       if (e.message.includes("405") || e.message.includes("404")) {
-        // Try query string with id or artworkId
         return await apiCall(`/Artwork/watchlist?artworkId=${artworkId}&id=${artworkId}`, "DELETE", null, true);
       }
       throw e;
     }
   },
 
-  // Extend auction
   extend: async (id) => {
     return await apiCall(`/Artwork/extend/${id}`, "POST", {}, true);
   },

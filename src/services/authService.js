@@ -2,7 +2,6 @@ import { apiCall, setToken, setUser, removeToken, removeUser } from "./api";
 import { getAccessToken } from "./tokenService";
 
 export const authService = {
-  // Register new user
   register: async (email, password, fullName, role) => {
     console.log("📝 Starting registration for:", email);
     const response = await apiCall(
@@ -14,17 +13,18 @@ export const authService = {
         fullName: fullName,
         role: role,
       },
-      false // No auth required for registration
+      false
     );
     console.log("✅ Registration response:", response);
     return response;
   },
 
-  // Login user
   login: async (email, password) => {
     console.log("🔐 Starting login for:", email);
     
     try {
+      authService.logout();
+
       const response = await apiCall(
         "/Auth/login",
         "POST",
@@ -32,7 +32,7 @@ export const authService = {
           Email: email,
           password: password,
         },
-        false // No auth required for login
+        false
       );
 
       console.log("📥 Login API Response:", response);
@@ -44,7 +44,6 @@ export const authService = {
         
         setToken(response.token);
         
-        // Verify token was saved
         const savedToken = getAccessToken();
         if (savedToken) {
           console.log("✅ Token successfully saved to storage");
@@ -52,8 +51,7 @@ export const authService = {
           console.error("❌ Token was NOT saved to storage!");
         }
 
-        // Store basic user info
-        setUser({ email, role: "user" }); // Role will be updated from token
+        setUser({ email, role: "user" });
         console.log("✅ User info stored");
       } else {
         console.error("❌ No token in response:", response);
@@ -70,27 +68,22 @@ export const authService = {
     }
   },
 
-  // Admin-only endpoint (to verify authorization)
   adminOnly: async () => {
     return await apiCall("/Auth/admin-only", "GET", null, true);
   },
 
-  // Get pending artists
   getPendingArtists: async () => {
     return await apiCall("/Auth/pending-artists", "GET", null, true);
   },
 
-  // Approve artist
   approveArtist: async (id) => {
     return await apiCall(`/Auth/accept/${id}`, "POST", {}, true);
   },
 
-  // Reject artist
   rejectArtist: async (id) => {
     return await apiCall(`/Auth/reject/${id}`, "POST", {}, true);
   },
 
-  // Logout
   logout: () => {
     removeToken();
     removeUser();

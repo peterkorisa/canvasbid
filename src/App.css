@@ -3,3 +3,4 @@
   themes: light --default ,cupcake;
 }
 
+@custom-variant dark (&:where(.never-use-dark-mode, .never-use-dark-mode *));

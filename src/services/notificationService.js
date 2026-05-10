@@ -1,7 +1,6 @@
 import { apiCall } from "./api";
 
 export const notificationService = {
-  // Get user's notifications
   getNotifications: async () => {
     try {
       const serverNotifs = await apiCall("/Notification", "GET", null, true);
@@ -16,11 +15,9 @@ export const notificationService = {
         data = [serverNotifs];
       }
 
-      // Merge with local notifications
       const localNotifs = JSON.parse(localStorage.getItem('localNotifications') || '[]');
       return [...data, ...localNotifs];
     } catch (e) {
-      // If server fails (e.g. 404), still return local notifications
       const localNotifs = JSON.parse(localStorage.getItem('localNotifications') || '[]');
       return localNotifs;
     }

@@ -42,16 +42,11 @@ const CreateArtworksForm = ({ tags }) => {
     setLoading(true);
 
     try {
-      let imageBase64 = "";
+      const { getUserIdFromToken } = await import("../../../services/tokenService");
+      const artistId = getUserIdFromToken();
+      let imageFile = null;
       if (formData.images && formData.images.length > 0) {
-        // Convert first image to base64
-        const file = formData.images[0];
-        imageBase64 = await new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.readAsDataURL(file);
-          reader.onload = () => resolve(reader.result);
-          reader.onerror = (error) => reject(error);
-        });
+        imageFile = formData.images[0];
       }
 
       await artworkService.create(
@@ -60,7 +55,9 @@ const CreateArtworksForm = ({ tags }) => {
         parseFloat(formData.initialPrice) || 0,
         parseFloat(formData.initialPrice) * 1.5 || 0, // Placeholder buyNowPrice
         formData.category,
-        imageBase64,
+        imageFile,
+        formData.tags,
+        artistId,
         formData.auctionStartTime,
         formData.auctionEndTime
       );

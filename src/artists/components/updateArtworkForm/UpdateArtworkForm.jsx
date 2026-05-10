@@ -44,17 +44,16 @@ const UpdateArtworkForm = ({ tags, artwork, setArtworks, modalRef }) => {
 
     setLoading(true);
     try {
+      const { getUserIdFromToken } = await import("../../../services/tokenService");
+      const artistId = getUserIdFromToken();
       const targetId = artwork.id || artwork.artworkId;
 
-      let imageBase64 = artwork.image || null;
+      let imageFile = artwork.image || null;
       if (artwork.images && artwork.images.length > 0 && artwork.images[0] instanceof File) {
-        imageBase64 = await new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.readAsDataURL(artwork.images[0]);
-          reader.onload = () => resolve(reader.result);
-          reader.onerror = (error) => reject(error);
-        });
+        imageFile = artwork.images[0];
       }
+
+      const currentTags = (artwork.tags || artwork.artworkTags || []).map(t => typeof t === 'string' ? t : t.tagName);
 
       if (targetId) {
         await artworkService.update(
@@ -64,7 +63,9 @@ const UpdateArtworkForm = ({ tags, artwork, setArtworks, modalRef }) => {
           parseFloat(artwork.initialPrice || artwork.intialPrice) || 0,
           (parseFloat(artwork.initialPrice || artwork.intialPrice) || 0) * 1.5,
           artwork.category,
-          imageBase64,
+          imageFile,
+          currentTags,
+          artistId,
           artwork.startTime || artwork.auctionStartTime,
           artwork.endTime || artwork.auctionEndTime
         );
