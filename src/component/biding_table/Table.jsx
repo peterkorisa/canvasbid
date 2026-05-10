@@ -1,6 +1,5 @@
 import React from 'react';
 
-// Example props: bids = [{ name: 'Alice', price: 120, timestamp: '2026-03-17 10:30 AM' }]
 const BidHistoryTable = ({ bids }) => {
   return (
     <div className="overflow-x-auto mt-6">

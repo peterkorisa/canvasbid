@@ -10,6 +10,7 @@ import {
   getUserRoleFromToken,
 } from "./tokenService";
 
+
 export const BASE_URL = "https://app-260509210637.azurewebsites.net/api";
 
 let isRefreshing = false;
@@ -70,7 +71,7 @@ export const apiCall = async (
       if (response.status === 403) {
         throw new Error("Access Denied: Your account may be pending admin approval, or you do not have permission to view this.");
       }
-      
+
       let errorMessage = `API Error: ${response.status} ${response.statusText}`;
       try {
         const errorData = await response.json();
@@ -87,7 +88,7 @@ export const apiCall = async (
 
     const textData = await response.text();
     if (!textData) return null;
-    
+
     try {
       return JSON.parse(textData);
     } catch (e) {

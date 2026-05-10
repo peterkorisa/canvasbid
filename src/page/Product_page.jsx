@@ -7,7 +7,6 @@ import { bidService } from '../services/bidService';
 import { getToken, getUserRole, getUser } from '../services/api';
 import { formatImage } from '../utils/imageUtils';
 
-// BidHistoryTable Component
 const BidHistoryTable = ({ bids }) => {
   return (
     <div className="overflow-x-auto mt-6">
@@ -51,12 +50,11 @@ const BidHistoryTable = ({ bids }) => {
   );
 };
 
-// Product page
 const Productpage = () => {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [bidAmount, setBidAmount] = useState('');
-  const [showAlert, setShowAlert] = useState(null); // null | 'success' | 'error'
+  const [showAlert, setShowAlert] = useState(null);
   const [alertMessage, setAlertMessage] = useState('');
   const [bidHistory, setBidHistory] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -85,7 +83,6 @@ const Productpage = () => {
       const isWatched = Array.isArray(watchlist) && watchlist.some(item => item.artworkId === parseInt(artworkId));
       setIsInWatchlist(isWatched);
     } catch (err) {
-      // If error or not buyer, don't show in watchlist
       setIsInWatchlist(false);
     }
   };
@@ -100,7 +97,6 @@ const Productpage = () => {
         const bidsData = await bidService.getBids(id);
         setBidHistory(Array.isArray(bidsData) ? bidsData : []);
 
-        // Check if in watchlist
         await checkWatchlistStatus(id);
       } catch (err) {
         setShowAlert('error');
@@ -115,27 +111,24 @@ const Productpage = () => {
     }
   }, [id]);
 
-  // Countdown timer effect
   useEffect(() => {
     if (!product || !product.endTime) return;
 
     const calculateTimeLeft = () => {
       let dateStr = product.endTime;
-      // If the backend returns the date without timezone info, assume it is UTC 
-      // since we sent it via .toISOString() when creating the artwork
+
       if (dateStr && !dateStr.endsWith('Z') && !dateStr.includes('+')) {
         dateStr += 'Z';
       }
       const end = new Date(dateStr);
-      
-      // Handle C# DateTime.MinValue (0001-01-01) which means no date was set
+
       if (end.getFullYear() <= 1) {
         setTimeLeft('No End Time Set');
         return true;
       }
 
       const now = new Date().getTime();
-      
+
       let startStr = product.startTime || product.StartTime;
       if (startStr && !startStr.endsWith('Z') && !startStr.includes('+')) {
         startStr += 'Z';
@@ -162,50 +155,45 @@ const Productpage = () => {
       if (difference <= 0) {
         setTimeLeft('Auction Ended');
         if (!isAuctionClosed && !closingAuction) {
-           setIsAuctionClosed(true);
-           setClosingAuction(true);
-           
-           const role = getUserRole();
-           // Only call backend if user is Admin to prevent 403 Forbidden errors
-           if (role === 'Admin') {
-             bidService.closeAuction(id).then(() => {
-                console.log('Auction closed successfully');
-             }).catch((err) => {
-                if (err.message && err.message.includes("403")) {
-                  console.log('Auction ended. Waiting for server or admin to finalize.');
+          setIsAuctionClosed(true);
+          setClosingAuction(true);
+
+          const role = getUserRole();
+          if (role === 'Admin') {
+            bidService.closeAuction(id).then(() => {
+              console.log('Auction closed successfully');
+            }).catch((err) => {
+              if (err.message && err.message.includes("403")) {
+                console.log('Auction ended. Waiting for server or admin to finalize.');
+              }
+            });
+          } else {
+            const currentUser = getUser();
+            if (currentUser && currentUser.email && bidHistory && bidHistory.length > 0) {
+              const myName = currentUser.email.split("@")[0];
+              const topBid = bidHistory[0];
+              const topBidder = topBid?.bidderName || topBid?.userName;
+
+              const topBidderPrefix = topBidder?.includes('@') ? topBidder.split('@')[0] : topBidder;
+
+              if (topBidder === currentUser.email || topBidderPrefix === myName || topBidder === currentUser.username) {
+                const localNotifs = JSON.parse(localStorage.getItem('localNotifications') || '[]');
+                if (!localNotifs.some(n => n.artworkId === id)) {
+                  localNotifs.push({
+                    id: 'local_' + Date.now(),
+                    artworkId: id,
+                    title: 'Bid Won! ',
+                    message: `Congratulations! You won the auction for "${product.title}"!`,
+                    image: product.image,
+                    createdAt: new Date().toISOString()
+                  });
+                  localStorage.setItem('localNotifications', JSON.stringify(localNotifs));
                 }
-             });
-           } else {
-             // For artists and buyers, we can't close the auction via API, so we check locally if they won
-             const currentUser = getUser();
-             if (currentUser && currentUser.email && bidHistory && bidHistory.length > 0) {
-                const myName = currentUser.email.split("@")[0];
-                // Check both userName and bidderName since API uses bidderName
-                const topBid = bidHistory[0]; // Backend sorts by amount descending, so index 0 is the highest
-                const topBidder = topBid?.bidderName || topBid?.userName;
-                
-                // topBidder might be the full email from the backend, so we need to compare both email and username
-                const topBidderPrefix = topBidder?.includes('@') ? topBidder.split('@')[0] : topBidder;
-                
-                if (topBidder === currentUser.email || topBidderPrefix === myName || topBidder === currentUser.username) {
-                   // Create a local notification for the buyer
-                   const localNotifs = JSON.parse(localStorage.getItem('localNotifications') || '[]');
-                   if (!localNotifs.some(n => n.artworkId === id)) {
-                      localNotifs.push({
-                         id: 'local_' + Date.now(),
-                         artworkId: id,
-                         title: 'Bid Won! 🎉',
-                         message: `Congratulations! You won the auction for "${product.title}"!`,
-                         image: product.image,
-                         createdAt: new Date().toISOString()
-                      });
-                      localStorage.setItem('localNotifications', JSON.stringify(localNotifs));
-                   }
-                }
-             }
-           }
+              }
+            }
+          }
         }
-        return true; // ended
+        return true;
       }
 
       const days = Math.floor(difference / (1000 * 60 * 60 * 24));
@@ -214,7 +202,7 @@ const Productpage = () => {
       const seconds = Math.floor((difference % (1000 * 60)) / 1000);
 
       setTimeLeft(`${days > 0 ? days + 'd ' : ''}${hours}h ${minutes}m ${seconds}s`);
-      return false; // not ended
+      return false;
     };
 
     const isEnded = calculateTimeLeft();
@@ -260,7 +248,6 @@ const Productpage = () => {
         setAlertMessage(`Your bid of $${numericBid.toFixed(2)} has been placed!`);
         setBidAmount('');
 
-        // Refresh bid history
         const bidsData = await bidService.getBids(id);
         setBidHistory(Array.isArray(bidsData) ? bidsData : []);
 
@@ -286,13 +273,11 @@ const Productpage = () => {
     try {
       setWatchlistLoading(true);
       if (isInWatchlist) {
-        // Remove from watchlist
         await artworkService.removeFromWatchlist(parseInt(id));
         setIsInWatchlist(false);
         setShowAlert('success');
         setAlertMessage('Removed from watchlist');
       } else {
-        // Add to watchlist
         await artworkService.addToWatchlist(parseInt(id));
         setIsInWatchlist(true);
         setShowAlert('success');
@@ -332,7 +317,6 @@ const Productpage = () => {
       <div className="bg-gray-100 dark:bg-gray-900 w-full min-h-screen py-8 pt-[5rem]">
         <div className="flex flex-wrap md:flex-nowrap w-full -mx-4 px-4 items-stretch">
 
-          {/* Images */}
           <div className="w-full md:w-1/2 px-4 mb-8 md:mb-0 flex flex-col">
             <img
               src={formatImage(product.image, 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080', id)}
@@ -342,14 +326,13 @@ const Productpage = () => {
             />
           </div>
 
-          {/* Details */}
           <div className="w-full md:w-1/2 px-4 flex flex-col justify-start">
             <h2 className="text-4xl font-bold mb-2 dark:text-white">{product.title}</h2>
             <p className="text-lg font-medium text-gray-500 dark:text-gray-400 mb-2">
               By {product.artistName || product.ownerName || product.user?.userName || product.user?.name || "Unknown Artist"}
             </p>
             <p className="text-gray-600 dark:text-gray-400 mb-4">Category: {product.category}</p>
-            
+
             <div className="mb-4">
               <span className="text-2xl font-bold mr-2 dark:text-white">${product.intialPrice?.toFixed(2) || '0.00'}</span>
               <span className="text-gray-500 line-through">${product.buyNowPrice?.toFixed(2) || '0.00'}</span>
@@ -400,11 +383,10 @@ const Productpage = () => {
               <button
                 onClick={handleWatchlistToggle}
                 disabled={watchlistLoading}
-                className={`flex items-center justify-center gap-2 px-6 py-3 rounded-md text-lg font-semibold transition ${
-                  isInWatchlist
-                    ? '!bg-red-600 hover:!bg-red-700 text-white'
-                    : '!bg-gray-400 hover:!bg-gray-500 text-white'
-                } focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed`}
+                className={`flex items-center justify-center gap-2 px-6 py-3 rounded-md text-lg font-semibold transition ${isInWatchlist
+                  ? '!bg-red-600 hover:!bg-red-700 text-white'
+                  : '!bg-gray-400 hover:!bg-gray-500 text-white'
+                  } focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed`}
                 title={isInWatchlist ? 'Remove from watchlist' : 'Add to watchlist'}
               >
                 <span className="text-xl">
@@ -414,7 +396,6 @@ const Productpage = () => {
               </button>
             </div>
 
-            {/* Alerts */}
             {showAlert === 'success' && (
               <div role="alert" className="alert alert-success mt-4 flex items-center bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 p-4 rounded-md shadow">
                 <span>{alertMessage}</span>
@@ -429,7 +410,6 @@ const Productpage = () => {
               </div>
             )}
 
-            {/* Bid History Table */}
             <BidHistoryTable bids={bidHistory} />
 
           </div>

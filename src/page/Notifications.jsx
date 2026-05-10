@@ -14,7 +14,7 @@ const Notifications = () => {
       try {
         const response = await notificationService.getNotifications();
         console.log("Notifications API Response:", response);
-        
+
         let dataToSet = [];
         if (Array.isArray(response)) {
           dataToSet = response;
@@ -37,11 +37,11 @@ const Notifications = () => {
         // Deduplicate notifications (in case backend and local show the same alert)
         const seen = new Set();
         dataToSet = dataToSet.filter(n => {
-           // Create a unique key based on message or title to remove duplicates
-           const key = (n.message || n.content || n.body || '') + (n.title || n.header || '');
-           if (seen.has(key)) return false;
-           seen.add(key);
-           return true;
+          // Create a unique key based on message or title to remove duplicates
+          const key = (n.message || n.content || n.body || '') + (n.title || n.header || '');
+          if (seen.has(key)) return false;
+          seen.add(key);
+          return true;
         });
 
         // Sort all notifications by date descending
@@ -149,11 +149,11 @@ const Notifications = () => {
                     </h2>
                     <div className="text-base-content/80 mt-1">
                       {notification.message || notification.content || notification.body ? (
-                         <p>{notification.message || notification.content || notification.body}</p>
+                        <p>{notification.message || notification.content || notification.body}</p>
                       ) : (
-                         <pre className="text-xs bg-base-200 p-2 rounded mt-2 overflow-x-auto">
-                           {JSON.stringify(notification, null, 2)}
-                         </pre>
+                        <pre className="text-xs bg-base-200 p-2 rounded mt-2 overflow-x-auto">
+                          {JSON.stringify(notification, null, 2)}
+                        </pre>
                       )}
                     </div>
                     {notification.createdAt || notification.date || notification.timestamp ? (

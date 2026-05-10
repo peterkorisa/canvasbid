@@ -10,12 +10,11 @@ const Watchlist = () => {
   const [watchlistItems, setWatchlistItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [showAlert, setShowAlert] = useState(null); // null | 'success' | 'error'
+  const [showAlert, setShowAlert] = useState(null);
   const [alertMessage, setAlertMessage] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if user is a buyer
     const userRole = getUserRole();
     if (!userRole || userRole !== 'Buyer') {
       navigate('/');

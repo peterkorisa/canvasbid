@@ -8,10 +8,11 @@ export const artworkService = {
     formData.append("buyNowPrice", buyNowPrice);
     formData.append("intialPrice", initialPrice);
     formData.append("category", category);
-    
+
     if (imageFile instanceof File) {
       formData.append("Image", imageFile);
     } else if (imageFile) {
+
       formData.append("image", imageFile);
     }
 
@@ -68,7 +69,7 @@ export const artworkService = {
     formData.append("buyNowPrice", buyNowPrice);
     formData.append("intialPrice", initialPrice);
     formData.append("category", category);
-    
+
     if (imageFile instanceof File) {
       formData.append("Image", imageFile);
     } else if (imageFile) {

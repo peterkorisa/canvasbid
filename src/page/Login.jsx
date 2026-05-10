@@ -21,11 +21,11 @@ const LoginForm = ({ toggleTheme, theme }) => {
     try {
       console.log("🚀 handleSubmit: Starting login...");
       const result = await authService.login(email, password);
-      
+
       // Verify token was actually saved
       const token = getAccessToken();
       console.log("🔍 After login, token in storage:", token ? "✅ YES" : "❌ NO");
-      
+
       if (!token) {
         throw new Error("❌ Token was not saved to storage. Cannot proceed.");
       }
@@ -33,7 +33,7 @@ const LoginForm = ({ toggleTheme, theme }) => {
       // Redirect based on user role
       const role = getUserRole();
       console.log("👤 User role:", role);
-      
+
       if (role === "Admin") {
         console.log("➡️ Redirecting to /admin");
         navigate("/admin");

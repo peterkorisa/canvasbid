@@ -6,7 +6,6 @@ const HeroSection = () => {
     <div className="hero pt-16 min-h-screen">
       <div className="hero-content flex-col lg:flex-row-reverse px-6 lg:px-20 gap-12">
 
-        {/* 3D Hover Image */}
         <div className="hover-3d">
           <figure className="max-w-xs rounded-2xl overflow-hidden">
             <img
@@ -16,7 +15,6 @@ const HeroSection = () => {
             />
           </figure>
 
-          {/* Required 8 divs for 3D effect */}
           <div></div>
           <div></div>
           <div></div>
@@ -27,7 +25,6 @@ const HeroSection = () => {
           <div></div>
         </div>
 
-        {/* Text Content */}
         <div className="text-center lg:text-left lg:ml-10 max-w-lg">
           <h1 className="text-5xl md:text-6xl font-extrabold mb-4">
             Discover & Bid on Masterpieces

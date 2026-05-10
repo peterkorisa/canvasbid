@@ -3,7 +3,7 @@ import { getAccessToken } from "./tokenService";
 
 export const authService = {
   register: async (email, password, fullName, role) => {
-    console.log("📝 Starting registration for:", email);
+    console.log(" Starting registration for:", email);
     const response = await apiCall(
       "/Auth/register",
       "POST",
@@ -15,13 +15,13 @@ export const authService = {
       },
       false
     );
-    console.log("✅ Registration response:", response);
+    console.log(" Registration response:", response);
     return response;
   },
 
   login: async (email, password) => {
-    console.log("🔐 Starting login for:", email);
-    
+    console.log(" Starting login for:", email);
+
     try {
       authService.logout();
 
@@ -35,31 +35,31 @@ export const authService = {
         false
       );
 
-      console.log("📥 Login API Response:", response);
-      console.log("📥 Response keys:", response ? Object.keys(response) : "null");
+      console.log("Login API Response:", response);
+      console.log(" Response keys:", response ? Object.keys(response) : "null");
 
       if (response && response.token) {
-        console.log("🔑 Token found in response, saving...");
+        console.log(" Token found in response, saving...");
         console.log("   Token preview:", response.token.substring(0, 50) + "...");
-        
+
         setToken(response.token);
-        
+
         const savedToken = getAccessToken();
         if (savedToken) {
-          console.log("✅ Token successfully saved to storage");
+          console.log(" Token successfully saved to storage");
         } else {
-          console.error("❌ Token was NOT saved to storage!");
+          console.error(" Token was NOT saved to storage!");
         }
 
         setUser({ email, role: "user" });
-        console.log("✅ User info stored");
+        console.log(" User info stored");
       } else {
-        console.error("❌ No token in response:", response);
+        console.error(" No token in response:", response);
       }
 
       return response;
     } catch (error) {
-      console.error("❌ Login failed with error:", {
+      console.error(" Login failed with error:", {
         message: error.message,
         stack: error.stack,
         error: error,

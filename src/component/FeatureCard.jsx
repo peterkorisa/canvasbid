@@ -14,7 +14,7 @@ const FeaturedCards = () => {
       id: 2,
       title: "Ocean Whispers",
       description: "Limited edition piece by Kai Nakamura. Join the live auction today.",
-      img:art2,
+      img: art2,
     },
     {
       id: 3,
@@ -29,7 +29,7 @@ const FeaturedCards = () => {
       {cards.map((card) => (
         <div key={card.id} className="card  image-full w-full shadow-lg">
           <figure className="h-75">
-            <img src={card.img} alt={card.title} className="w-full h-full "/>
+            <img src={card.img} alt={card.title} className="w-full h-full " />
           </figure>
           <div className="card-body">
             <h2 className="card-title">{card.title}</h2>
