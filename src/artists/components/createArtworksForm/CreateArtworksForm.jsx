@@ -11,19 +11,16 @@ const CreateArtworksForm = ({ tags }) => {
 
     const { title, description, initialPrice, category, auctionStartTime, auctionEndTime, images } = formData;
 
-    // Check if all fields are filled
     if (!title || !description || !initialPrice || !category || category === "Pick a color" || !auctionStartTime || !auctionEndTime) {
       alert("Please fill in all required fields.");
       return;
     }
 
-    // Check if images are uploaded
     if (!images || images.length === 0) {
       alert("Please upload at least one image.");
       return;
     }
 
-    // Validate times
     const start = new Date(auctionStartTime);
     const end = new Date(auctionEndTime);
     const today = new Date();
@@ -53,7 +50,7 @@ const CreateArtworksForm = ({ tags }) => {
         formData.title,
         formData.description,
         parseFloat(formData.initialPrice) || 0,
-        parseFloat(formData.initialPrice) * 1.5 || 0, // Placeholder buyNowPrice
+        parseFloat(formData.initialPrice) * 1.5 || 0,
         formData.category,
         imageFile,
         formData.tags,

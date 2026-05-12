@@ -15,14 +15,12 @@ const Artists = () => {
     <div className="drawer lg:drawer-open">
       <input id="my-drawer-4" type="checkbox" className="drawer-toggle" />
       <div className="drawer-content  flex flex-col h-screen overflow-x-hidden">
-        {/* Navbar */}
         <nav className="navbar bg-base-300 w-screen ">
           <label
             htmlFor="my-drawer-4"
             aria-label="open sidebar"
             className="btn btn-square btn-ghost"
           >
-            {/* Sidebar toggle icon */}
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -42,7 +40,6 @@ const Artists = () => {
             CanvasBid
           </Link>
         </nav>
-        {/* Page content here */}
         <div className="p-4 !text-white bg-[#1a1a40] grow ">
           <Outlet />
         </div>
@@ -55,7 +52,6 @@ const Artists = () => {
           className="drawer-overlay"
         ></label>
         <div className="flex min-h-full flex-col items-start bg-base-200 is-drawer-close:w-16 is-drawer-open:w-64">
-          {/* Sidebar content here */}
           <ul className="menu w-full grow">
             <li>
               <button
@@ -70,7 +66,6 @@ const Artists = () => {
                 <span className="is-drawer-close:hidden ">Artworks</span>
               </button>
             </li>
-            {/*create artwork*/}
             <li>
               <button
                 onClick={() => {
@@ -84,10 +79,9 @@ const Artists = () => {
                 <span className="is-drawer-close:hidden ">Create artwork</span>
               </button>
             </li>
-            
-            {/*Delete artwork*/}
 
-            
+
+
           </ul>
         </div>
       </div>

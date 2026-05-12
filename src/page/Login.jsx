@@ -19,34 +19,32 @@ const LoginForm = ({ toggleTheme, theme }) => {
     setLoading(true);
 
     try {
-      console.log("🚀 handleSubmit: Starting login...");
+      console.log(" handleSubmit: Starting login...");
       const result = await authService.login(email, password);
 
-      // Verify token was actually saved
       const token = getAccessToken();
-      console.log("🔍 After login, token in storage:", token ? "✅ YES" : "❌ NO");
+      console.log(" After login, token in storage:", token ? "YES" : " NO");
 
       if (!token) {
-        throw new Error("❌ Token was not saved to storage. Cannot proceed.");
+        throw new Error(" Token was not saved to storage. Cannot proceed.");
       }
 
-      // Redirect based on user role
       const role = getUserRole();
-      console.log("👤 User role:", role);
+      console.log(" User role:", role);
 
       if (role === "Admin") {
-        console.log("➡️ Redirecting to /admin");
+        console.log(" Redirecting to /admin");
         navigate("/admin");
       } else if (role === "Artist") {
-        console.log("➡️ Redirecting to /artists/");
+        console.log(" Redirecting to /artists/");
         navigate("/artists/");
       } else {
-        console.log("➡️ Redirecting to /artworks");
+        console.log(" Redirecting to /artworks");
         navigate("/artworks");
       }
     } catch (err) {
       const errorMsg = err.message || "Login failed. Please check your credentials.";
-      console.error("❌ Login error details:", {
+      console.error(" Login error details:", {
         message: errorMsg,
         error: err,
         baseUrl: "https://app-260421214011.azurewebsites.net/api",
@@ -74,7 +72,6 @@ const LoginForm = ({ toggleTheme, theme }) => {
       <section className="bg-gray-50 dark:bg-gray-900 py-20 w-full">
         <div className="w-full grid lg:grid-cols-2 gap-16 items-center">
 
-          {/* Left Side */}
           <div className="px-6 lg:px-20">
             <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white mb-6">
               Welcome Back
@@ -85,13 +82,13 @@ const LoginForm = ({ toggleTheme, theme }) => {
             </p>
 
             <div className="space-y-4 text-gray-600 dark:text-gray-400">
-              <p>📧 support@example.com</p>
-              <p>🌍 Available worldwide</p>
-              <p>⚡ Usually replies within 24 hours</p>
+              <p> support@example.com</p>
+              <p> Available worldwide</p>
+              <p> Usually replies within 24 hours</p>
             </div>
           </div>
 
-          {/* Form Card */}
+
           <div className="px-6 lg:px-20">
             <div className="w-full bg-white dark:bg-gray-800 p-6 sm:p-10 rounded-2xl shadow-xl">
               {error && (
@@ -102,7 +99,6 @@ const LoginForm = ({ toggleTheme, theme }) => {
 
               <form className="space-y-6" onSubmit={handleSubmit}>
 
-                {/* Email */}
                 <div>
                   <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
                     Email
@@ -117,7 +113,6 @@ const LoginForm = ({ toggleTheme, theme }) => {
                   />
                 </div>
 
-                {/* Password */}
                 <div>
                   <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
                     Password
@@ -132,7 +127,6 @@ const LoginForm = ({ toggleTheme, theme }) => {
                   />
                 </div>
 
-                {/* Submit */}
                 <button
                   type="submit"
                   disabled={loading}
@@ -142,7 +136,6 @@ const LoginForm = ({ toggleTheme, theme }) => {
                 </button>
               </form>
 
-              {/* Extra info */}
               <div className="mt-6 text-center text-gray-500 dark:text-gray-400 text-sm">
                 New here?{" "}
                 <Link

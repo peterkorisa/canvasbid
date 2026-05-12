@@ -6,7 +6,6 @@ const UpdateModal = ({ artwork, tags, setArtworks, artworks }) => {
 
   return (
     <div className="">
-      {/* Open the modal using document.getElementById('ID').showModal() method */}
       <button className="btn btn-warning !bg-warning" onClick={() => modalRef.current.showModal()}>
         Update
       </button>
@@ -22,8 +21,7 @@ const UpdateModal = ({ artwork, tags, setArtworks, artworks }) => {
           />
           <div className="modal-action ">
             <form method="dialog" >
-              {/* if there is a button in form, it will close the modal */}
-              {/* <button className="btn">Close</button> */}
+
             </form>
           </div>
         </div>

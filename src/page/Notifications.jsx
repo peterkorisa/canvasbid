@@ -23,28 +23,22 @@ const Notifications = () => {
         } else if (response && Array.isArray(response.notifications)) {
           dataToSet = response.notifications;
         } else if (response && typeof response === 'object') {
-          // If it's a single object or an unexpected format, wrap it in an array so it doesn't crash map
           dataToSet = [response];
         } else if (response && typeof response === 'string') {
-          // If the backend just returns a plain string message
           dataToSet = [{ message: response }];
         }
 
-        // Add local notifications (like local "Bid Won" alerts)
         const localNotifs = JSON.parse(localStorage.getItem('localNotifications') || '[]');
         dataToSet = [...localNotifs, ...dataToSet];
 
-        // Deduplicate notifications (in case backend and local show the same alert)
         const seen = new Set();
         dataToSet = dataToSet.filter(n => {
-          // Create a unique key based on message or title to remove duplicates
           const key = (n.message || n.content || n.body || '') + (n.title || n.header || '');
           if (seen.has(key)) return false;
           seen.add(key);
           return true;
         });
 
-        // Sort all notifications by date descending
         dataToSet.sort((a, b) => {
           const dateA = new Date(a.createdAt || a.date || a.timestamp || 0);
           const dateB = new Date(b.createdAt || b.date || b.timestamp || 0);
@@ -54,7 +48,6 @@ const Notifications = () => {
         setNotifications(dataToSet);
       } catch (err) {
         console.error("Error fetching notifications:", err);
-        // If the backend returns 404 when there are no notifications, treat it as an empty list
         if (err.message && err.message.includes("404")) {
           setNotifications([]);
         } else {

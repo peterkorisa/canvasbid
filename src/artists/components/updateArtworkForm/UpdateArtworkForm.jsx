@@ -5,7 +5,7 @@ const UpdateArtworkForm = ({ tags, artwork, setArtworks, modalRef }) => {
   const [loading, setLoading] = useState(false);
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     const title = artwork.title;
     const description = artwork.discreption || artwork.description;
     const initialPrice = artwork.initialPrice || artwork.intialPrice;
@@ -14,19 +14,16 @@ const UpdateArtworkForm = ({ tags, artwork, setArtworks, modalRef }) => {
     const endTimeStr = artwork.endTime || artwork.auctionEndTime;
     const hasImages = (artwork.images && artwork.images.length > 0) || artwork.image;
 
-    // Check if all fields are filled
     if (!title || !description || !initialPrice || !category || category === "Pick a color" || !startTimeStr || !endTimeStr) {
       alert("Please fill in all required fields.");
       return;
     }
 
-    // Check if images are uploaded or exist
     if (!hasImages) {
       alert("Please upload at least one image.");
       return;
     }
 
-    // Validate times
     const start = new Date(startTimeStr);
     const end = new Date(endTimeStr);
     const today = new Date();
@@ -71,7 +68,6 @@ const UpdateArtworkForm = ({ tags, artwork, setArtworks, modalRef }) => {
         );
       }
 
-      // Update local storage if it's pending
       const pendingArtworks = JSON.parse(localStorage.getItem('artistPendingArtworks') || '[]');
       const index = pendingArtworks.findIndex(a => (a.id || a.artworkId) === targetId);
       if (index !== -1) {
@@ -127,17 +123,15 @@ const UpdateArtworkForm = ({ tags, artwork, setArtworks, modalRef }) => {
   const formatDateForInput = (dateString) => {
     if (!dateString) return "";
     let str = typeof dateString === 'string' ? dateString : dateString.toString();
-    if (str.includes('0001-01-01')) return ""; // Handle C# min value
-    
+    if (str.includes('0001-01-01')) return "";
+
     if (str.endsWith('Z')) {
-       // Convert UTC ISO string to local time format YYYY-MM-DDThh:mm
-       const d = new Date(str);
-       if (isNaN(d.getTime())) return "";
-       const pad = (n) => String(n).padStart(2, '0');
-       return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+      const d = new Date(str);
+      if (isNaN(d.getTime())) return "";
+      const pad = (n) => String(n).padStart(2, '0');
+      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
     }
-    
-    // If no Z, assume it's already local, just slice up to minutes
+
     if (str.length >= 16) return str.substring(0, 16);
     return str;
   };

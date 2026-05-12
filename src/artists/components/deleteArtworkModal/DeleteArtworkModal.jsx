@@ -12,7 +12,6 @@ const DeleteArtworkModal = ({ artwork, setArtworks }) => {
         try {
           await artworkService.delete(targetId);
         } catch (backendError) {
-          // If the backend crashes (CORS / 500 error), we do a "frontend soft-delete"
           console.warn("Backend failed to delete, hiding it locally.", backendError);
           const deletedList = JSON.parse(localStorage.getItem('deletedArtworks') || '[]');
           if (!deletedList.includes(targetId)) {
@@ -21,13 +20,13 @@ const DeleteArtworkModal = ({ artwork, setArtworks }) => {
           }
         }
       }
-      
+
       setArtworks((prev) => prev.filter((a) => (a.artworkId || a.id) !== targetId));
-      
+
       const pendingArtworks = JSON.parse(localStorage.getItem('artistPendingArtworks') || '[]');
       const updatedPending = pendingArtworks.filter(a => (a.artworkId || a.id) !== targetId);
       localStorage.setItem('artistPendingArtworks', JSON.stringify(updatedPending));
-      
+
       modalRef.current.close();
     } catch (error) {
       alert("Failed to delete artwork locally: " + error.message);

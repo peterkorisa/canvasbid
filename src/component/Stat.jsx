@@ -5,7 +5,7 @@ const StatsSection = () => {
   return (
     <div className="w-full  py-10">
       <div className="stats w-full max-w-full flex justify-around flex-col sm:flex-row px-4 sm:px-0">
-        {/* Live Auctions */}
+
         <div className="stat place-items-center flex-1 px-4 py-6">
           <FaGavel className="text-4xl text-primary mb-2" />
           <div className="stat-title">Live Auctions</div>
@@ -13,7 +13,7 @@ const StatsSection = () => {
           <div className="stat-desc">Currently ongoing</div>
         </div>
 
-        {/* Registered Bidders */}
+
         <div className="stat place-items-center flex-1 px-4 py-6">
           <FaUsers className="text-4xl text-secondary mb-2" />
           <div className="stat-title">Registered Bidders</div>
@@ -21,7 +21,7 @@ const StatsSection = () => {
           <div className="stat-desc text-secondary">Active participants</div>
         </div>
 
-        {/* Artworks Sold */}
+
         <div className="stat place-items-center flex-1 px-4 py-6">
           <FaPalette className="text-4xl text-accent mb-2" />
           <div className="stat-title">Artworks Sold</div>

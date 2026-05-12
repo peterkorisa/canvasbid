@@ -109,9 +109,7 @@ const Navbar = () => {
   return (
     <div className="">
       <div className="navbar bg-transparent shadow-sm w-full fixed top-0 left-0 z-50 backdrop-blur-md">
-        {/* Left Section */}
         <div className="navbar-start ">
-          {/* Mobile Menu */}
           <div className="dropdown">
             <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
               <svg
@@ -164,7 +162,6 @@ const Navbar = () => {
             </ul>
           </div>
 
-          {/* Logo */}
           <Link
             to="/"
             className="btn btn-ghost text-3xl !font-black !text-[#5937E0]"
@@ -173,7 +170,6 @@ const Navbar = () => {
           </Link>
         </div>
 
-        {/* Center Menu */}
         <div className="navbar-center hidden lg:flex">
           <ul className="menu menu-horizontal px-1 text-base">
             <li>
@@ -206,7 +202,6 @@ const Navbar = () => {
           </ul>
         </div>
 
-        {/* Right Buttons */}
         <div className="navbar-end gap-2">
           {isLoggedIn ? (
             <>
@@ -261,14 +256,12 @@ const Navbar = () => {
           )}
 
           <label className="swap swap-rotate">
-            {/* this hidden checkbox controls the state */}
             <input
               type="checkbox"
               className="theme-controller"
               value="synthwave"
             />
 
-            {/* sun icon */}
             <svg
               className="swap-off h-10 w-10 fill-current"
               xmlns="http://www.w3.org/2000/svg"
@@ -288,7 +281,6 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Real-time Notification Toast */}
       {toastNotification && (
         <div className="toast toast-top toast-center z-[100] mt-16 cursor-pointer" onClick={() => { navigate('/notifications'); setToastNotification(null); }}>
           <div className="alert alert-info shadow-lg flex items-start gap-4 bg-primary text-primary-content hover:bg-primary-focus transition-colors">
