@@ -1,5 +1,6 @@
 import React from "react";
 import pic from "../assets/mona.jpg";
+import { Link } from "react-router-dom";
 
 const HeroSection = () => {
   return (
@@ -36,13 +37,13 @@ const HeroSection = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row sm:justify-center lg:justify-start gap-4">
-            <button className="btn btn-primary btn-lg px-8 py-4 hover:scale-105 transition text-white !bg-[#FF9E0C]">
+            <Link to="/artworks" className="btn btn-primary btn-lg px-8 py-4 hover:scale-105 transition !text-white !bg-[#FF9E0C]">
               Start Bidding
-            </button>
+            </Link>
 
-            <button className="btn btn-outline btn-lg px-8 py-4 hover:bg-indigo-100 transition">
+            <Link to="/contact" className="btn btn-outline btn-lg px-8 py-4 hover:bg-indigo-100 transition">
               Learn More
-            </button>
+            </Link>
           </div>
 
           <p className="mt-6 text-gray-500 text-sm">

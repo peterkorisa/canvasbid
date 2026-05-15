@@ -88,12 +88,12 @@ const PendingArtworksTable = () => {
                         </div>
                       </div>
                       <div>
-                        <div className="font-bold text-lg">{art.title}</div>
-                        <div className="text-sm opacity-70">{art.artistName || 'Unknown Artist'}</div>
+                        <div className="font-bold text-lg text-black">{art.title}</div>
+                        <div className="text-sm opacity-70 text-black">{art.artistName || 'Unknown Artist'}</div>
                       </div>
                     </div>
                   </td>
-                  <td>
+                  <td className="text-black">
                     {art.category || 'Uncategorized'}
                     <br />
                     <span className="badge badge-ghost badge-sm mt-1">
@@ -102,20 +102,20 @@ const PendingArtworksTable = () => {
                   </td>
                   <td>
                     <span className="badge badge-warning gap-1">
-                      {art.status}
+                      {art.status==0 && "pending"}
                     </span>
                   </td>
                   <th>
                     <div className="flex gap-2">
                       <button 
                         onClick={() => handleApprove(art.artworkId || art.id)}
-                        className="btn btn-sm bg-green-500 hover:bg-green-600 text-white border-none"
+                        className="btn btn-sm !bg-green-500 hover:bg-green-600 text-white border-none"
                       >
                         Approve
                       </button>
                       <button 
                         onClick={() => handleReject(art.artworkId || art.id)}
-                        className="btn btn-sm bg-red-500 hover:bg-red-600 text-white border-none"
+                        className="btn btn-sm !bg-red-500 hover:bg-red-600 text-white border-none"
                       >
                         Reject
                       </button>

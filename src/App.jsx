@@ -42,7 +42,7 @@ function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<LoginForm />} />
           <Route path="/register" element={<RegisterForm />} />
-          {/* Admin Routes */}
+
           <Route path="/admin/" element={<ProtectedRoute allowedRoles={["Admin"]} />}>
             <Route element={<Dashboard />}>
               <Route index element={<AdminMain />} />
@@ -50,7 +50,7 @@ function App() {
               <Route path="users" element={<Users />} />
             </Route>
           </Route>
-          {/* Artist Routes */}
+
           <Route path="/artists/" element={<ProtectedRoute allowedRoles={["Artist"]} />}>
             <Route element={<Artists />}>
               <Route path="" element={<ListArtwork tags={tags} />} />

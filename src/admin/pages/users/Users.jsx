@@ -75,14 +75,6 @@ const Users = () => {
                   <tr key={user.id}>
                     <td>
                       <div className="flex items-center gap-3">
-                        <div className="avatar">
-                          <div className="mask mask-squircle h-12 w-12 bg-gray-200">
-                            <img
-                              src="https://img.daisyui.com/images/profile/demo/2@94.webp"
-                              alt="Avatar"
-                            />
-                          </div>
-                        </div>
                         <div>
                           <div className="font-bold">{user.name || user.userName}</div>
                         </div>
@@ -92,7 +84,7 @@ const Users = () => {
                     <td>Artist</td>
                     <td>
                       <span className="badge badge-warning gap-1">
-                        {user.status}
+                        {user.status==0 && "Pending"}
                       </span>
                     </td>
 

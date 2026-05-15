@@ -9,7 +9,6 @@ const Contact = () => {
       <section className="bg-gray-50 dark:bg-gray-900 py-20 w-full">
         <div className="w-full grid lg:grid-cols-2 gap-16 items-center">
 
-          {/* Left Side */}
           <div className="px-6 lg:px-20">
             <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white mb-6">
               Let's Talk
@@ -21,13 +20,12 @@ const Contact = () => {
             </p>
 
             <div className="space-y-4 text-gray-600 dark:text-gray-400">
-              <p>📧 support@example.com</p>
-              <p>🌍 Available worldwide</p>
-              <p>⚡ Usually replies within 24 hours</p>
+              <p> support@example.com</p>
+              <p> Available worldwide</p>
+              <p> Usually replies within 24 hours</p>
             </div>
           </div>
 
-          {/* Form Card */}
           <div className="px-6 lg:px-20">
             <div className="w-full bg-white dark:bg-gray-800 p-6 sm:p-10 rounded-2xl shadow-xl">
               <form className="space-y-6">

@@ -116,10 +116,6 @@ const Productpage = () => {
 
     const calculateTimeLeft = () => {
       let dateStr = product.endTime;
-
-      if (dateStr && !dateStr.endsWith('Z') && !dateStr.includes('+')) {
-        dateStr += 'Z';
-      }
       const end = new Date(dateStr);
 
       if (end.getFullYear() <= 1) {
@@ -130,9 +126,6 @@ const Productpage = () => {
       const now = new Date().getTime();
 
       let startStr = product.startTime || product.StartTime;
-      if (startStr && !startStr.endsWith('Z') && !startStr.includes('+')) {
-        startStr += 'Z';
-      }
       const start = new Date(startStr);
       const startTimeMs = start.getTime();
 
@@ -158,40 +151,11 @@ const Productpage = () => {
           setIsAuctionClosed(true);
           setClosingAuction(true);
 
-          const role = getUserRole();
-          if (role === 'Admin') {
-            bidService.closeAuction(id).then(() => {
-              console.log('Auction closed successfully');
-            }).catch((err) => {
-              if (err.message && err.message.includes("403")) {
-                console.log('Auction ended. Waiting for server or admin to finalize.');
-              }
-            });
-          } else {
-            const currentUser = getUser();
-            if (currentUser && currentUser.email && bidHistory && bidHistory.length > 0) {
-              const myName = currentUser.email.split("@")[0];
-              const topBid = bidHistory[0];
-              const topBidder = topBid?.bidderName || topBid?.userName;
-
-              const topBidderPrefix = topBidder?.includes('@') ? topBidder.split('@')[0] : topBidder;
-
-              if (topBidder === currentUser.email || topBidderPrefix === myName || topBidder === currentUser.username) {
-                const localNotifs = JSON.parse(localStorage.getItem('localNotifications') || '[]');
-                if (!localNotifs.some(n => n.artworkId === id)) {
-                  localNotifs.push({
-                    id: 'local_' + Date.now(),
-                    artworkId: id,
-                    title: 'Bid Won! ',
-                    message: `Congratulations! You won the auction for "${product.title}"!`,
-                    image: product.image,
-                    createdAt: new Date().toISOString()
-                  });
-                  localStorage.setItem('localNotifications', JSON.stringify(localNotifs));
-                }
-              }
-            }
-          }
+          bidService.closeAuction(id).then(() => {
+            console.log('Auction closed successfully');
+          }).catch((err) => {
+            console.error('Failed to close auction', err);
+          });
         }
         return true;
       }
@@ -389,9 +353,7 @@ const Productpage = () => {
                   } focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed`}
                 title={isInWatchlist ? 'Remove from watchlist' : 'Add to watchlist'}
               >
-                <span className="text-xl">
-                  {isInWatchlist ? '❤️' : '🤍'}
-                </span>
+                
                 {isInWatchlist ? 'In Watchlist' : 'Add to Watchlist'}
               </button>
             </div>

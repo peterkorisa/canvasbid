@@ -24,8 +24,8 @@ export const artworkService = {
       formData.append("artistId", artistId);
     }
 
-    if (startTime) formData.append("startTime", new Date(startTime).toISOString());
-    if (endTime) formData.append("endTime", new Date(endTime).toISOString());
+    if (startTime) formData.append("startTime", startTime);
+    if (endTime) formData.append("endTime", endTime);
 
     const newArtwork = await apiCall(
       "/Artwork",
@@ -84,8 +84,8 @@ export const artworkService = {
       formData.append("artistId", artistId);
     }
 
-    if (startTime) formData.append("startTime", new Date(startTime).toISOString());
-    if (endTime) formData.append("endTime", new Date(endTime).toISOString());
+    if (startTime) formData.append("startTime", startTime);
+    if (endTime) formData.append("endTime", endTime);
 
     return await apiCall(
       `/Artwork/${id}`,

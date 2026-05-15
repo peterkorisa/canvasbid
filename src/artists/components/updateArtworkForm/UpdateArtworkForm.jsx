@@ -19,10 +19,6 @@ const UpdateArtworkForm = ({ tags, artwork, setArtworks, modalRef }) => {
       return;
     }
 
-    if (!hasImages) {
-      alert("Please upload at least one image.");
-      return;
-    }
 
     const start = new Date(startTimeStr);
     const end = new Date(endTimeStr);
@@ -124,16 +120,8 @@ const UpdateArtworkForm = ({ tags, artwork, setArtworks, modalRef }) => {
     if (!dateString) return "";
     let str = typeof dateString === 'string' ? dateString : dateString.toString();
     if (str.includes('0001-01-01')) return "";
-
-    if (str.endsWith('Z')) {
-      const d = new Date(str);
-      if (isNaN(d.getTime())) return "";
-      const pad = (n) => String(n).padStart(2, '0');
-      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-    }
-
-    if (str.length >= 16) return str.substring(0, 16);
-    return str;
+    
+    return str.substring(0, 16);
   };
 
   return (

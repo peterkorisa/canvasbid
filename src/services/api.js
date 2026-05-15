@@ -10,8 +10,7 @@ import {
   getUserRoleFromToken,
 } from "./tokenService";
 
-
-export const BASE_URL = "https://app-260509210637.azurewebsites.net/api";
+export const BASE_URL = "http://localhost:5028/api";
 
 let isRefreshing = false;
 let refreshPromise = null;
@@ -28,7 +27,7 @@ export const apiCall = async (
   endpoint,
   method = "GET",
   body = null,
-  requiresAuth = true
+  requiresAuth = true,
 ) => {
   const headers = {};
   const isFormData = body instanceof FormData;
@@ -69,19 +68,32 @@ export const apiCall = async (
 
     if (!response.ok) {
       if (response.status === 403) {
-        throw new Error("Access Denied: Your account may be pending admin approval, or you do not have permission to view this.");
+        throw new Error(
+          "Access Denied: Your account may be pending admin approval, or you do not have permission to view this.",
+        );
       }
 
       let errorMessage = `API Error: ${response.status} ${response.statusText}`;
+      const responseText = await response.text();
+      
       try {
-        const errorData = await response.json();
+        const errorData = JSON.parse(responseText);
         if (errorData.errors) {
           const firstKey = Object.keys(errorData.errors)[0];
-          errorMessage = Array.isArray(errorData.errors[firstKey]) ? errorData.errors[firstKey][0] : errorData.errors[firstKey];
+          errorMessage = Array.isArray(errorData.errors[firstKey])
+            ? errorData.errors[firstKey][0]
+            : errorData.errors[firstKey];
         } else {
-          errorMessage = errorData.message || errorData.error || errorData.title || errorMessage;
+          errorMessage =
+            errorData.message ||
+            errorData.error ||
+            errorData.title ||
+            errorMessage;
         }
       } catch (e) {
+        if (responseText) {
+          errorMessage = responseText;
+        }
       }
       throw new Error(errorMessage);
     }
@@ -108,7 +120,7 @@ export const decodeToken = (token) => {
       atob(base64)
         .split("")
         .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
-        .join("")
+        .join(""),
     );
     return JSON.parse(jsonPayload);
   } catch (error) {
@@ -124,7 +136,8 @@ export const getUserRole = () => {
   const decoded = decodeToken(token);
   if (!decoded) return null;
 
-  const roleKey = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role";
+  const roleKey =
+    "http://schemas.microsoft.com/ws/2008/06/identity/claims/role";
   const roles = decoded[roleKey];
 
   return Array.isArray(roles) ? roles[0] : roles;

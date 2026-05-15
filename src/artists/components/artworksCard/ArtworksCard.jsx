@@ -3,7 +3,11 @@ import DeleteArtworkModal from "./../deleteArtworkModal/DeleteArtworkModal";
 import { formatImage } from "../../../utils/imageUtils";
 
 const ArtworksCard = ({ artwork, tags, setArtworks, artworks }) => {
-  console.log(artwork);
+  const formatDateTime = (dateStr) => {
+    if (!dateStr) return "";
+    return dateStr.replace('T', ' ').substring(0, 16);
+  };
+
   return (
     <div className="card card-side shadow-sm bg-[#0000a1] ">
       <figure>
@@ -30,11 +34,11 @@ const ArtworksCard = ({ artwork, tags, setArtworks, artworks }) => {
         </div>
         <div className="flex flex-row gap-1 items-center">
           <p className="text-base font-semibold">Auction start time:</p>
-          <p className="font-normal">{artwork.startTime || artwork.auctionStartTime}</p>
+          <p className="font-normal">{formatDateTime(artwork.startTime || artwork.auctionStartTime)}</p>
         </div>
         <div className="flex flex-row gap-1 items-center">
           <p className="text-base font-semibold">Auction end time:</p>
-          <p className="font-normal">{artwork.endTime || artwork.auctionEndTime}</p>
+          <p className="font-normal">{formatDateTime(artwork.endTime || artwork.auctionEndTime)}</p>
         </div>
         <div className="flex flex-row gap-1 items-center">
           <p className="text-base font-semibold">Category:</p>

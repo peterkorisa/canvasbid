@@ -60,7 +60,6 @@ const RegisterForm = () => {
       <section className="bg-gray-50 dark:bg-gray-900 py-20 w-full">
         <div className="w-full grid lg:grid-cols-2 gap-16 items-center">
 
-          {/* Left Side */}
           <div className="px-6 lg:px-20">
             <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white mb-6">
               Create Account
@@ -71,13 +70,12 @@ const RegisterForm = () => {
             </p>
 
             <div className="space-y-4 text-gray-600 dark:text-gray-400">
-              <p>📧 support@example.com</p>
-              <p>🌍 Available worldwide</p>
-              <p>⚡ Quick support response</p>
+              <p> support@example.com</p>
+              <p> Available worldwide</p>
+              <p> Quick support response</p>
             </div>
           </div>
 
-          {/* Form Card */}
           <div className="px-6 lg:px-20">
             <div className="w-full bg-white dark:bg-gray-800 p-6 sm:p-10 rounded-2xl shadow-xl">
               {error && (
@@ -94,7 +92,6 @@ const RegisterForm = () => {
 
               <form className="space-y-6" onSubmit={handleSubmit}>
 
-                {/* Full Name */}
                 <div>
                   <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
                     Full Name
@@ -109,7 +106,6 @@ const RegisterForm = () => {
                   />
                 </div>
 
-                {/* Email */}
                 <div>
                   <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
                     Email
@@ -124,7 +120,6 @@ const RegisterForm = () => {
                   />
                 </div>
 
-                {/* Role Selection */}
                 <div>
                   <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
                     Account Type
@@ -139,7 +134,6 @@ const RegisterForm = () => {
                   </select>
                 </div>
 
-                {/* Password */}
                 <div>
                   <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
                     Password
@@ -154,7 +148,6 @@ const RegisterForm = () => {
                   />
                 </div>
 
-                {/* Confirm Password */}
                 <div>
                   <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
                     Confirm Password
@@ -169,7 +162,6 @@ const RegisterForm = () => {
                   />
                 </div>
 
-                {/* Submit */}
                 <button
                   type="submit"
                   disabled={loading}
@@ -179,7 +171,6 @@ const RegisterForm = () => {
                 </button>
               </form>
 
-              {/* Fixed Bottom Info */}
               <div className="mt-8 flex justify-center text-red-600 dark:text-red-400 text-sm">
                 <span>Already have an account?</span>
                 <Link

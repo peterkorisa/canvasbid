@@ -14,7 +14,6 @@ const ListArtwork = ({ tags }) => {
     const fetchArtworks = async () => {
       try {
         setLoading(true);
-        // Fetch the artist's artworks using the new endpoint
         const data = await artworkService.getMyArtworks();
         const approvedArtworks = Array.isArray(data) ? data : [];
         
@@ -22,20 +21,16 @@ const ListArtwork = ({ tags }) => {
         try {
           pendingArtworks = JSON.parse(localStorage.getItem('artistPendingArtworks') || '[]');
           
-          // Filter out any pending artworks that have been approved (i.e. their ID is now in the approved list)
           const approvedIds = new Set(approvedArtworks.map(art =>  art.artworkId || art.id));
           pendingArtworks = pendingArtworks.filter(pendingArt => !approvedIds.has(pendingArt.artworkId || pendingArt.id));
           
-          // Update local storage to remove approved ones
           localStorage.setItem('artistPendingArtworks', JSON.stringify(pendingArtworks));
         } catch (e) {
           console.error("Failed to load pending artworks from local storage", e);
         }
 
-        // Combine approved and pending artworks
         const combined = [...pendingArtworks, ...approvedArtworks];
         
-        // Filter out locally soft-deleted artworks
         const deletedList = JSON.parse(localStorage.getItem('deletedArtworks') || '[]');
         const activeArtworks = combined.filter(art => !deletedList.includes(art.artworkId || art.id));
         

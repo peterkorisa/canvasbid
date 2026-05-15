@@ -40,7 +40,11 @@ const ArtworksHome = () => {
   const tagsArray = tagsParam ? tagsParam.split(",").map(t => t.toLowerCase()) : [];
 
   const filteredArtworks = artworks.filter((artwork) => {
-    if (query && !artwork.title?.toLowerCase().includes(query)) return false;
+    if (query) {
+      const titleMatch = artwork.title?.toLowerCase().includes(query);
+      const artistMatch = (artwork.artistName || artwork.ownerName || artwork.user?.userName || artwork.user?.name || "").toLowerCase().includes(query);
+      if (!titleMatch && !artistMatch) return false;
+    }
     if (category && artwork.category?.toLowerCase() !== category.toLowerCase()) return false;
     if (tagsArray.length > 0) {
       const artworkTags = (artwork.tags || []).map(t => typeof t === 'string' ? t.toLowerCase() : (t.tagName?.toLowerCase() || ""));
